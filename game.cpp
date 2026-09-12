@@ -74,7 +74,12 @@ void Game::CreateSectors() {
 }
 void Game::MainMenu(){
 
-};
+}
 void Game::GenerateEntities(){
+
     
+}
+void Game::CharacterCreator(){
+    
+
 }

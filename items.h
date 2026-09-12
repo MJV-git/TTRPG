@@ -8,7 +8,7 @@ class item{
     protected:
     int id;
     int value;
-    std::string name;
+    std::string name; 
 
 };
 

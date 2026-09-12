@@ -2,13 +2,7 @@
 #include "map.h"
 #include "game.h"
 
-Entity::Entity( int health, int armor, int strength, int precision, int will, int sector){
-    health = health;
-    armor = armor;
-    strength = strength;
-    precision = precision;
-    will = will;
-    sector = sector;
+Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector){
 }
 
 void Entity::MoveTo() {

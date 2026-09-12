@@ -13,6 +13,7 @@ class Player: public Entity {
 
     public:
     Player();//constructor
+    void CreatePlayer();
 
    
 };

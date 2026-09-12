@@ -16,6 +16,7 @@ class Game{
 
 
     public:
+    void CharacterCreator();
     void GenerateEntities();
     void MainMenu();
     void CreateSectors();//generate sectors

@@ -2,3 +2,8 @@
 
 Player::Player() {
 }
+
+void Player::CreatePlayer(){
+    
+
+}
