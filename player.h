@@ -12,8 +12,7 @@ class Player: public Entity {
 
 
     public:
-    Player();//constructor
-    void CreatePlayer();
+    Player(int, int, int, int, int, int);//constructor
 
    
 };

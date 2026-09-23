@@ -4,6 +4,7 @@
 #include <vector>
 #include "map.h"
 #include "entity.h"
+#include <memory>
 
 
 
@@ -12,7 +13,7 @@ class Game{
     int turnCount, chaosLevel;//track turns and chaos level
     std::string selectedBoss; //track boss selected
     std::vector<Sector> sectorVector; //sectors stored here
-    std::vector<Entity> entityVector;// entities stored here
+    std::vector<std::unique_ptr<Entity>> entityVector;// entities stored here
 
 
     public:
@@ -20,8 +21,8 @@ class Game{
     void GenerateEntities();
     void MainMenu();
     void CreateSectors();//generate sectors
-    void AddToEV(Entity entity){
-        entityVector.push_back(entity);
+    void AddToEV(std::unique_ptr<Entity> entity){
+        entityVector.push_back(std::move(entity));
     }
     void AddToSV(Sector generatedSector){
         sectorVector.push_back(generatedSector);
