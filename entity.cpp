@@ -2,23 +2,26 @@
 #include "map.h"
 #include "game.h"
 
-Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector){
+Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector, std::string eName) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector), name(eName){
 }
 
-void Entity::MoveTo(int destination) {
+void Entity::moveTo(int destination) {
     sector = destination;
     
 }
 
-void Entity::CheckStatus() {
+void Entity::checkStatus() {
 }
 
-void Entity::Kill() {
+void Entity::kill() {
 }
 
-void Entity::Spawn() {
+void Entity::spawn() {
 }
 
-int Entity::GetSector(){
+int Entity::getSector(){
     return sector;
+}
+std::string Entity::getName(){
+    return name;
 }

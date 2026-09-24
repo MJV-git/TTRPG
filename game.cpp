@@ -11,12 +11,12 @@ std::uniform_int_distribution<int> secDist(2,9);
 //now if I ever need a random number anywhere i just create a uniform int distribution and name it, range it, and call it
     
 
-void Game::Initialize() {
-    CreateSectors();
-    GenerateEntities();
+void Game::initialize() {
+    createSectors();
+    generateEntities();
 }
 
-void Game::ProcessTurn() {
+void Game::processTurn() {
     switch (currentState){
         case gamestate::playerTurn:
         break;
@@ -32,17 +32,17 @@ void Game::ProcessTurn() {
     }
 }
 
-void Game::Render() {
+void Game::render() {
 }
 
-void Game::Draw() {
+void Game::draw() {
 }
 
-void Game::Update() {
+void Game::update() {
 }
 
-void Game::AdvancePlayerTurn(){
-    if(GetPlayer() && currentState == gamestate::playerTurn){
+void Game::advancePlayerTurn(){
+    if(getPlayer() && currentState == gamestate::playerTurn){
         playerIdx++;
             if(playerIdx == playerList.size()){
             currentState = gamestate::worldTurn;
@@ -54,7 +54,7 @@ void Game::AdvancePlayerTurn(){
 }
 
 
-void Game::CreateSectors() {
+void Game::createSectors() {
 
     std::string names[9] {"Barracks", "Armory", "Alley", "Streets", "Cathedral", "Infirmary", "Slums", "Market", "Bridge"};
 
@@ -104,18 +104,23 @@ void Game::CreateSectors() {
             break;
         }
 
-        AddToSV(Sector(ID, name, destinations));
+        addToSV(Sector(ID, name, destinations));
     }
 
 }
-void Game::MainMenu(){
+void Game::mainMenu(){
 
 }
-bool Game::Movement(Entity& entity, int sector){
-    int currentSector = entity.GetSector();
+bool Game::movement(Entity& entity, int sector){
+    int currentSector = entity.getSector();
     int destination = sector;
+    
     if(currentState != gamestate::playerTurn){
         std::cout << "Not Player Turn" << std::endl;
+        return false;
+    }
+    if(&entity != getPlayer()){
+        std::cout << "It is " << getPlayer()->getName() << "'s Turn" << std::endl;
         return false;
     }
     if(currentSector < 1 ||  currentSector > sectorVector.size()){
@@ -127,8 +132,8 @@ bool Game::Movement(Entity& entity, int sector){
         return false;
     }
 
-    if(sectorVector[currentSector - 1].CheckConnecting(destination)){
-        entity.MoveTo(destination);
+    if(sectorVector[currentSector - 1].checkConnecting(destination)){
+        entity.moveTo(destination);
         return true;
 
     }
@@ -137,30 +142,33 @@ bool Game::Movement(Entity& entity, int sector){
 
 
 }
-void Game::GenerateEntities(){
+void Game::generateEntities(){
     int i = 0;
     while(i < 2){
         int rSec = secDist(gen);
-        auto enemy = std::make_unique<Enemy>(5, 1, 2, 2, 2, rSec);
-        AddToEV(std::move(enemy));
+        auto enemy = std::make_unique<Enemy>(5, 1, 2, 2, 2, rSec, "Tyranid");
+        addToEV(std::move(enemy));
         i++;
     }
     
 
     
 }
-bool Game::CharacterCreator(int pHealth, int pArmor, int pStrength, int pPrecision, int pWill){
+bool Game::characterCreator(int pHealth, int pArmor, int pStrength, int pPrecision, int pWill, std::string name){
+   /*Add this to GUI when made 
+    std::cout << "Please enter a name for your character" << std::endl;
+    std::getline(std::cin, name);*/
     if(pArmor > 4 || pHealth < 0 || pArmor < 0 || pStrength < 0 || pPrecision < 0 || pWill < 0){
         std::cout << "Error, invalid values detected" << std::endl;
         return false;
     }
     int pointPool = 50;
     int pointSpend = 0;
-    pointSpend += StatCost(pHealth);
-    pointSpend += StatCost(pArmor);
-    pointSpend += StatCost(pStrength);
-    pointSpend += StatCost(pPrecision);
-    pointSpend += StatCost(pWill);
+    pointSpend += statCost(pHealth);
+    pointSpend += statCost(pArmor);
+    pointSpend += statCost(pStrength);
+    pointSpend += statCost(pPrecision);
+    pointSpend += statCost(pWill);
     if(pointPool < pointSpend){
         std::cout << "Error, Exceeded Point Pool" << std::endl;
         return false;
@@ -168,18 +176,18 @@ bool Game::CharacterCreator(int pHealth, int pArmor, int pStrength, int pPrecisi
     int pHP = 1 + 3 * pHealth;
 
 
-    auto player = std::make_unique<Player>(pHP, pArmor, pStrength, pPrecision, pWill, 1);
+    auto player = std::make_unique<Player>(pHP, pArmor, pStrength, pPrecision, pWill, 1, name);
 
     playerList.push_back(player.get());
-    AddToEV(std::move(player));
+    addToEV(std::move(player));
     return true;
 
 
 }
-int Game::StatCost(int n){
+int Game::statCost(int n){
         return n * (n + 1) / 2;
     }
-Player* Game::GetPlayer(){
+Player* Game::getPlayer(){
     if(playerList.empty() || playerIdx < 0 || playerIdx >= playerList.size()){
         return nullptr;
     }

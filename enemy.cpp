@@ -1,4 +1,4 @@
 #include "enemy.h"
 
-Enemy::Enemy( int pHealth, int pArmor, int pStrength, int pPrecision, int pWill, int pSector) : Entity(pHealth, pArmor, pStrength, pPrecision, pWill, pSector) {
+Enemy::Enemy( int nHealth, int nArmor, int nStrength, int nPrecision, int nWill, int nSector, std::string nName ) : Entity(nHealth, nArmor, nStrength, nPrecision, nWill, nSector, nName) {
 }

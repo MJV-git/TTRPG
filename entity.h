@@ -9,13 +9,14 @@ class Entity {
     bool isAlive;// HP check
 
     public:
-    Entity(int, int, int, int, int, int);
+    Entity(int, int, int, int, int, int, std::string name);
     virtual ~Entity() = default;
-    void MoveTo(int);// traverse from sector to sector, use checkconnecting fucntion in map
-    void CheckStatus();// check all stats and alive bool
-    void Kill();//kill an entity, remove from entity vector
-    void Spawn();//add to entity vector
-    int GetSector();
+    void moveTo(int);// traverse from sector to sector, use checkconnecting fucntion in map
+    void checkStatus();// check all stats and alive bool
+    void kill();//kill an entity, remove from entity vector
+    void spawn();//add to entity vector
+    int getSector();
+    std::string getName();
 
 
 };

@@ -25,27 +25,26 @@ class Game{
 
 
     public:
-    void AdvancePlayerTurn();
-    Player* GetPlayer();
-    int StatCost(int);
-    bool Movement(Entity& , int);
-    bool CharacterCreator(int, int, int, int ,int);
-    void GenerateEntities();
-    void MainMenu();
-    void CreateSectors();//generate sectors
-    void AddToEV(std::unique_ptr<Entity> entity){
+    void advancePlayerTurn();
+    Player* getPlayer();
+    int statCost(int);
+    bool movement(Entity& , int);
+    bool characterCreator(int, int, int, int ,int, std::string);
+    void generateEntities();
+    void mainMenu();
+    void createSectors();//generate sectors
+    void addToEV(std::unique_ptr<Entity> entity){
         entityVector.push_back(std::move(entity));
     }
-    void AddToSV(Sector generatedSector){
+    void addToSV(Sector generatedSector){
         sectorVector.push_back(generatedSector);
     };
-    void Initialize(); // set the board
-    void ProcessTurn();// process all events
+    void initialize(); // set the board
+    void processTurn();// process all events
 
     //GUI shit, do not touch until you have numbers working
-    void Render();
-    void Draw();
-    void Update();
+    void render();
+    void draw();
+    void update();
 
 };
-

@@ -8,11 +8,11 @@
 
 class Player: public Entity {
     private:
-    std::vector<std::unique_ptr<item>> inventory; //store items
+    std::vector<std::unique_ptr<Item>> inventory; //store items
 
 
     public:
-    Player(int, int, int, int, int, int);//constructor
+    Player(int, int, int, int, int, int, std::string);//constructor
 
    
 };

@@ -4,7 +4,7 @@
 
 
 //different item types
-class item{
+class Item{
     protected:
     int id;
     int value;
@@ -12,14 +12,14 @@ class item{
 
 };
 
-class weapon: public item{
+class Weapon: public Item{
     int damageMelee;
     int damageRanged;
     int damagePsychic;
 
 };
 
-class consumable: public item{
+class Consumable: public Item{
     int healthRestore;
     int armRestore;
 

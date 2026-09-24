@@ -3,23 +3,23 @@
 int main(){
     Game game;
     Player* currentPlayer;
-    bool characterCreated = game.CharacterCreator(4, 4, 4, 4, 4);
+    bool characterCreated = game.characterCreator(4, 4, 4, 4, 4, "Jeff");
     if(characterCreated){
         std::cout << characterCreated << std::endl;
-        game.Initialize();
+        game.initialize();
     }
-    currentPlayer = game.GetPlayer();
+    currentPlayer = game.getPlayer();
     if (currentPlayer == nullptr){
         std::cout << "No Players!" << std::endl;
         return 1;
     }
     
-    bool moved = game.Movement(*currentPlayer, 2);
-    std::cout << currentPlayer->GetSector() << std::endl;
+    bool moved = game.movement(*currentPlayer, 2);
+    std::cout << currentPlayer->getSector() << std::endl;
     if(moved){
-        game.AdvancePlayerTurn();
+        game.advancePlayerTurn();
     }
-    game.Movement(*currentPlayer, 6);
-    std::cout << currentPlayer->GetSector() << std::endl;
+    game.movement(*currentPlayer, 6);
+    std::cout << currentPlayer->getSector() << std::endl;
     
 }

@@ -1,3 +1,3 @@
 #include "items.h"
 
-// Define item, weapons, and consumables member functions here when declared in items.h.
+// Define Item, Weapon, and Consumable member functions here when declared in items.h.
