@@ -1,11 +1,35 @@
 #include "game.h"
 
+//since this is a learning project, I looked up how this clearly googled bullshit actually works
+//apparently this random_device function generates a seed, computationally expensive so it is called only once per run
+std::random_device rd;
+//mt19937 is the number scrambler, that generates a sequence of numbers from the generated seed
+std::mt19937 gen(rd());
+//uniform int distribution compresses the selected generated number into the desired rrange which is 2-9 for the purpose of spawning enemies.        
+std::uniform_int_distribution<int> secDist(2,9);
+//still don't fully understand it, magic mathematics number bullshit.
+//now if I ever need a random number anywhere i just create a uniform int distribution and name it, range it, and call it
+    
+
 void Game::Initialize() {
     CreateSectors();
     GenerateEntities();
 }
 
 void Game::ProcessTurn() {
+    switch (currentState){
+        case gamestate::playerTurn:
+        break;
+
+        case gamestate::worldTurn:
+        break;
+
+        case gamestate::enemyTurn:
+        break;
+
+        case gamestate::roundEnd:
+        break;
+    }
 }
 
 void Game::Render() {
@@ -15,6 +39,18 @@ void Game::Draw() {
 }
 
 void Game::Update() {
+}
+
+void Game::AdvancePlayerTurn(){
+    if(GetPlayer() && currentState == gamestate::playerTurn){
+        playerIdx++;
+            if(playerIdx == playerList.size()){
+            currentState = gamestate::worldTurn;
+            return;
+        }
+
+    }
+    
 }
 
 
@@ -75,11 +111,77 @@ void Game::CreateSectors() {
 void Game::MainMenu(){
 
 }
+bool Game::Movement(Entity& entity, int sector){
+    int currentSector = entity.GetSector();
+    int destination = sector;
+    if(currentState != gamestate::playerTurn){
+        std::cout << "Not Player Turn" << std::endl;
+        return false;
+    }
+    if(currentSector < 1 ||  currentSector > sectorVector.size()){
+        std::cout << "Sector Origin error: Sector Vector is Writhing in Pain" << std::endl;
+        return false;
+    }
+    if(sector < 1 ||  sector > sectorVector.size()){
+        std::cout << "Sector Destination error: Sector Vector is Writhing in Pain" << std::endl;
+        return false;
+    }
+
+    if(sectorVector[currentSector - 1].CheckConnecting(destination)){
+        entity.MoveTo(destination);
+        return true;
+
+    }
+    std::cout << "Sector Connection Failure" << std::endl;
+    return false;
+
+
+}
 void Game::GenerateEntities(){
+    int i = 0;
+    while(i < 2){
+        int rSec = secDist(gen);
+        auto enemy = std::make_unique<Enemy>(5, 1, 2, 2, 2, rSec);
+        AddToEV(std::move(enemy));
+        i++;
+    }
+    
 
     
 }
-void Game::CharacterCreator(){
-    
+bool Game::CharacterCreator(int pHealth, int pArmor, int pStrength, int pPrecision, int pWill){
+    if(pArmor > 4 || pHealth < 0 || pArmor < 0 || pStrength < 0 || pPrecision < 0 || pWill < 0){
+        std::cout << "Error, invalid values detected" << std::endl;
+        return false;
+    }
+    int pointPool = 50;
+    int pointSpend = 0;
+    pointSpend += StatCost(pHealth);
+    pointSpend += StatCost(pArmor);
+    pointSpend += StatCost(pStrength);
+    pointSpend += StatCost(pPrecision);
+    pointSpend += StatCost(pWill);
+    if(pointPool < pointSpend){
+        std::cout << "Error, Exceeded Point Pool" << std::endl;
+        return false;
+    }
+    int pHP = 1 + 3 * pHealth;
 
+
+    auto player = std::make_unique<Player>(pHP, pArmor, pStrength, pPrecision, pWill, 1);
+
+    playerList.push_back(player.get());
+    AddToEV(std::move(player));
+    return true;
+
+
+}
+int Game::StatCost(int n){
+        return n * (n + 1) / 2;
+    }
+Player* Game::GetPlayer(){
+    if(playerList.empty() || playerIdx < 0 || playerIdx >= playerList.size()){
+        return nullptr;
+    }
+    return playerList[playerIdx];
 }

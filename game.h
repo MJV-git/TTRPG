@@ -1,15 +1,23 @@
 #pragma once
-
+#include <iostream>
 #include <string>
 #include <vector>
 #include "map.h"
 #include "entity.h"
+#include "player.h"
+#include "enemy.h"
 #include <memory>
+#include <random>
 
-
+enum class gamestate{
+    playerTurn, worldTurn, enemyTurn, roundEnd
+};
 
 class Game{
     private:
+    gamestate currentState = gamestate::playerTurn;
+    int playerIdx = 0;
+    std::vector<Player*> playerList;
     int turnCount, chaosLevel;//track turns and chaos level
     std::string selectedBoss; //track boss selected
     std::vector<Sector> sectorVector; //sectors stored here
@@ -17,7 +25,11 @@ class Game{
 
 
     public:
-    void CharacterCreator();
+    void AdvancePlayerTurn();
+    Player* GetPlayer();
+    int StatCost(int);
+    bool Movement(Entity& , int);
+    bool CharacterCreator(int, int, int, int ,int);
     void GenerateEntities();
     void MainMenu();
     void CreateSectors();//generate sectors
@@ -36,3 +48,4 @@ class Game{
     void Update();
 
 };
+

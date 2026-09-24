@@ -7,7 +7,7 @@ class Enemy: public Entity{
     
 
     public:
-    
+    Enemy(int, int, int, int, int, int);
 
 
 };
