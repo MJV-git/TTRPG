@@ -18,7 +18,8 @@ class Game{
     gamestate currentState = gamestate::playerTurn;
     int playerIdx = 0;
     std::vector<Player*> playerList;
-    int turnCount, chaosLevel;//track turns and chaos level
+    int turnCount =0;
+    int chaosLevel = 0;//track turns and chaos level
     std::string selectedBoss; //track boss selected
     std::vector<Sector> sectorVector; //sectors stored here
     std::vector<std::unique_ptr<Entity>> entityVector;// entities stored here

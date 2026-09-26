@@ -15,23 +15,31 @@ void Game::initialize() {
     createSectors();
     generateEntities();
 }
-
+//steps through the turn process, must be called for each turn section.
 void Game::processTurn() {
     switch (currentState){
         case gamestate::playerTurn:
         break;
 
         case gamestate::worldTurn:
+        std::cout << "PLACEHOLDER CARD EVENT" << std::endl;
+        currentState = gamestate::enemyTurn;
         break;
 
         case gamestate::enemyTurn:
+        std::cout << "PLACEHOLDER ENEMY ATTACK TURN" << std::endl;
+        currentState = gamestate::roundEnd;
         break;
 
         case gamestate::roundEnd:
+        turnCount++;
+        turnCount += chaosLevel;
+        playerIdx = 0;
+        currentState = gamestate::playerTurn;
         break;
     }
 }
-
+//gui stuff
 void Game::render() {
 }
 
@@ -40,7 +48,7 @@ void Game::draw() {
 
 void Game::update() {
 }
-
+//advances specifically player turn, seperate from process turn to allow for multiple players. GUI will handle this
 void Game::advancePlayerTurn(){
     if(getPlayer() && currentState == gamestate::playerTurn){
         playerIdx++;
@@ -53,7 +61,7 @@ void Game::advancePlayerTurn(){
     
 }
 
-
+//create the starting sectors, NOTE: considering making infirmary a leave only sector with no way of getting in except dying or world event.
 void Game::createSectors() {
 
     std::string names[9] {"Barracks", "Armory", "Alley", "Streets", "Cathedral", "Infirmary", "Slums", "Market", "Bridge"};
@@ -111,16 +119,23 @@ void Game::createSectors() {
 void Game::mainMenu(){
 
 }
+//movement validation system, uses moveTo on success
 bool Game::movement(Entity& entity, int sector){
     int currentSector = entity.getSector();
     int destination = sector;
+    Player* currentPlayer = getPlayer();
     
+
     if(currentState != gamestate::playerTurn){
         std::cout << "Not Player Turn" << std::endl;
         return false;
     }
-    if(&entity != getPlayer()){
-        std::cout << "It is " << getPlayer()->getName() << "'s Turn" << std::endl;
+    if(currentPlayer == nullptr){
+        std::cout << "Bad Player List" << std::endl;
+        return false;
+    }
+    if(&entity != currentPlayer){
+        std::cout << "It is " << currentPlayer->getName() << "'s Turn" << std::endl;
         return false;
     }
     if(currentSector < 1 ||  currentSector > sectorVector.size()){
@@ -142,6 +157,7 @@ bool Game::movement(Entity& entity, int sector){
 
 
 }
+//generates the initial enemies and adds to entity vector, TODO: later will include portals.
 void Game::generateEntities(){
     int i = 0;
     while(i < 2){
@@ -155,6 +171,7 @@ void Game::generateEntities(){
     
 }
 bool Game::characterCreator(int pHealth, int pArmor, int pStrength, int pPrecision, int pWill, std::string name){
+    //create character. NOTE: This will be powered by GUI
    /*Add this to GUI when made 
     std::cout << "Please enter a name for your character" << std::endl;
     std::getline(std::cin, name);*/
@@ -185,8 +202,10 @@ bool Game::characterCreator(int pHealth, int pArmor, int pStrength, int pPrecisi
 
 }
 int Game::statCost(int n){
+    //helper function to calculate stat cost of point allocation
         return n * (n + 1) / 2;
     }
+    //getter for player character from playerlist
 Player* Game::getPlayer(){
     if(playerList.empty() || playerIdx < 0 || playerIdx >= playerList.size()){
         return nullptr;

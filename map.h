@@ -12,5 +12,5 @@ class Sector{
 
     public:
     Sector(int, std::string, std::vector<int>);
-    bool checkConnecting(int);//validate sectors are copnnected
+    bool checkConnecting(int);//validate sectors are connected
 };
