@@ -1,4 +1,7 @@
 #include "game.h"
+#include "entity.h"
+#include "player.h"
+#include <random>
 
 //since this is a learning project, I looked up how this clearly googled bullshit actually works
 //apparently this random_device function generates a seed, computationally expensive so it is called only once per run
@@ -27,7 +30,28 @@ void Game::processTurn() {
         break;
 
         case gamestate::enemyTurn:
-        std::cout << "PLACEHOLDER ENEMY ATTACK TURN" << std::endl;
+        for (int i = 0; i < entityVector.size(); i++){
+            Enemy* enemy = dynamic_cast<Enemy*>(entityVector[i].get());
+            if (enemy != nullptr && enemy->getAlive()){
+                std::cout << enemy->getName() << std::endl;
+                std::vector<Player*> targets;
+                for (int j = 0; j < playerList.size(); j++){
+                    if (playerList[j]->getAlive() && playerList[j]->getSector() == enemy->getSector()){
+                        std::cout << playerList[j]->getName() << std::endl;
+                        targets.push_back(playerList[j]);
+                    }
+                }
+                if (targets.empty()){
+                    continue;
+                }else {
+                    std::uniform_int_distribution<int> selectedTargetIdx(0, targets.size()-1);
+                    int targetedPlayer = selectedTargetIdx(gen);
+                    std::cout << "Selected Target: " << targets[targetedPlayer]->getName() << std::endl;
+                    targets[targetedPlayer]->takeDamage(damageType::physical, 5);            
+                }
+            }
+        }
+        //std::cout << "PLACEHOLDER ENEMY ATTACK TURN" << std::endl;
         currentState = gamestate::roundEnd;
         break;
 
