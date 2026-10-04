@@ -1,6 +1,7 @@
 #include "game.h"
 #include "entity.h"
 #include "player.h"
+#include <cstddef>
 #include <random>
 
 //since this is a learning project, I looked up how this clearly googled bullshit actually works
@@ -47,7 +48,7 @@ void Game::processTurn() {
                     std::uniform_int_distribution<int> selectedTargetIdx(0, targets.size()-1);
                     int targetedPlayer = selectedTargetIdx(gen);
                     std::cout << "Selected Target: " << targets[targetedPlayer]->getName() << std::endl;
-                    targets[targetedPlayer]->takeDamage(damageType::physical, 5);            
+                    targets[targetedPlayer]->takeDamage(damageType::physical, 5);  
                 }
             }
         }
@@ -56,6 +57,7 @@ void Game::processTurn() {
         break;
 
         case gamestate::roundEnd:
+        checkEntityStatus();
         turnCount++;
         turnCount += chaosLevel;
         playerIdx = 0;
@@ -215,6 +217,7 @@ bool Game::characterCreator(int pHealth, int pArmor, int pStrength, int pPrecisi
         return false;
     }
     int pHP = 1 + 3 * pHealth;
+    
 
 
     auto player = std::make_unique<Player>(pHP, pArmor, pStrength, pPrecision, pWill, 1, name);
@@ -235,4 +238,23 @@ Player* Game::getPlayer(){
         return nullptr;
     }
     return playerList[playerIdx];
+}
+void Game::checkEntityStatus(){
+    for (int i = 0; i < entityVector.size(); i++){
+        if (entityVector[i]->getAlive()){
+            continue;
+        }else {
+            Enemy* enemy = dynamic_cast<Enemy*>(entityVector[i].get());
+            Player* player = dynamic_cast<Player*>(entityVector[i].get());
+            if(enemy != nullptr){
+                entityVector.erase(entityVector.begin() + i);
+                i--;
+            }else if(player != nullptr){
+                entityVector[i]->moveTo(6);
+                chaosLevel++;
+                entityVector[i]->heal();                
+            
+            }
+        } 
+    }
 }

@@ -4,7 +4,7 @@
 
 
 //as it stands, all children of this class are identical, will see if there will need to even be specific children or if they can be consolidated as one, ECS maybe? I like my way but maybe worth.
-Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector, std::string eName) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector), name(eName){
+Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector, std::string eName) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector), name(eName), maxHealth(eHealth){
 }
 //actual movement
 void Entity::moveTo(int destination) {
@@ -12,10 +12,8 @@ void Entity::moveTo(int destination) {
     
 }
 
-void Entity::checkStatus() {
-}
-
 void Entity::kill() {
+    
 }
 
 void Entity::spawn() {
@@ -48,6 +46,7 @@ void Entity::takeDamage(damageType damageType, int damage){
     if(health <= 0){
         std::cout << "You have been defeated, for now..." << std::endl;
 
+
         if (health <= -5){
             std::cout << "They really messed you up, you will need a turn to recover..." << std::endl;
             overKilled = true;
@@ -58,6 +57,10 @@ void Entity::takeDamage(damageType damageType, int damage){
         return;
     }
 
+}
+void Entity::heal(){
+    health = maxHealth;
+    isAlive = true;
 }
 //getters
 
@@ -72,4 +75,10 @@ int Entity::getSector(){
 }
 std::string Entity::getName(){
     return name;
+}
+
+//setters
+void Entity::setMaxHealth(int mHealth){
+    maxHealth = mHealth;
+
 }

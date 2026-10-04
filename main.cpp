@@ -1,3 +1,4 @@
+#include "entity.h"
 #include "game.h"
 
 int main(){
@@ -51,8 +52,15 @@ int main(){
     std::cout << currentPlayer->getSector() << std::endl;
     std::cout << currentPlayer->getName() << std::endl;
     
-    //damage test
+    /* damage test
     Entity dummy(10, 0, 4, 4, 4, 4, "dummy");
     dummy.takeDamage(damageType::psychic, 16);
-    dummy.getHealth();
+    dummy.getHealth();*/
+
+    currentPlayer->takeDamage(damageType::physical, 20);
+    std::cout << currentPlayer->getSector() << std::endl;
+
+
+
+
 }

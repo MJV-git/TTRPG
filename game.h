@@ -26,6 +26,7 @@ class Game{
 
 
     public:
+    void checkEntityStatus();
     void advancePlayerTurn();
     Player* getPlayer();
     int statCost(int);
@@ -42,6 +43,7 @@ class Game{
     };
     void initialize(); // set the board
     void processTurn();// process all events
+    int getChaosLevel() const { return chaosLevel; }
 
     //GUI shit, do not touch until you have numbers working
     void render();
