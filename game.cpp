@@ -48,7 +48,7 @@ void Game::processTurn() {
                     std::uniform_int_distribution<int> selectedTargetIdx(0, targets.size()-1);
                     int targetedPlayer = selectedTargetIdx(gen);
                     std::cout << "Selected Target: " << targets[targetedPlayer]->getName() << std::endl;
-                    targets[targetedPlayer]->takeDamage(damageType::physical, 5);  
+                    enemy->attack(*targets[targetedPlayer], chaosLevel);  
                 }
             }
         }
@@ -186,9 +186,17 @@ bool Game::movement(Entity& entity, int sector){
 //generates the initial enemies and adds to entity vector, TODO: later will include portals.
 void Game::generateEntities(){
     int i = 0;
-    while(i < 2){
+    std::vector<std::string> spawnTypes {
+        "Tyranid",
+        "Tyranid Warrior",
+        "Chaos Sorcerer"
+    };
+
+    while(i < spawnTypes.size()){
         int rSec = secDist(gen);
-        auto enemy = std::make_unique<Enemy>(5, 1, 2, 2, 2, rSec, "Tyranid");
+        //testing different enemies. NOTE: This should be changed back to spawning 2 basic enemies
+        //NOTE: Enemy tier levels maybe? lower indices lower tier in spawntypes? choose only between indices 0-3 in future
+        auto enemy = std::make_unique<Enemy> (spawnTypes[i], rSec);
         addToEV(std::move(enemy));
         i++;
     }

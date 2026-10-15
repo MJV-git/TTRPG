@@ -52,15 +52,24 @@ int main(){
     std::cout << currentPlayer->getSector() << std::endl;
     std::cout << currentPlayer->getName() << std::endl;
     
-    /* damage test
+    /*damage test
     Entity dummy(10, 0, 4, 4, 4, 4, "dummy");
     dummy.takeDamage(damageType::psychic, 16);
     dummy.getHealth();*/
 
     currentPlayer->takeDamage(damageType::physical, 20);
     std::cout << currentPlayer->getSector() << std::endl;
+    
+ 
+    Entity testTarget(30, 4, 1, 1, 1, 2, "Test Target");
+    Enemy tyranid("Tyranid", 2);
+    Enemy sorcerer("Chaos Sorcerer", 2);
 
+    tyranid.attack(testTarget, 2);
+    std::cout << testTarget.getHealth() << std::endl; // 27
 
+    sorcerer.attack(testTarget, 2);
+    std::cout << testTarget.getHealth() << std::endl; // 20
 
 
 }
