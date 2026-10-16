@@ -12,7 +12,7 @@ class Entity {
     int ID, health, armor, strength, precision, will, sector; // stats
     std::string name;//name
     bool isAlive = health > 0;// HP check
-    bool overKilled = false;
+    bool overkilled = false;
     int maxHealth;
 
     public:
@@ -29,9 +29,12 @@ class Entity {
     std::string getName();
     bool getAlive();
     int getHealth();
+    bool getOverkill();
 
     //setters
     void setMaxHealth(int);
+    void resetOverkill();
+    
 
 
 

@@ -49,7 +49,7 @@ void Entity::takeDamage(damageType damageType, int damage){
 
         if (health <= -5){
             std::cout << "They really messed you up, you will need a turn to recover..." << std::endl;
-            overKilled = true;
+            overkilled = true;
         }
 
         health = 0;
@@ -76,9 +76,17 @@ int Entity::getSector(){
 std::string Entity::getName(){
     return name;
 }
+bool Entity::getOverkill(){
+    return overkilled;
+}
 
 //setters
 void Entity::setMaxHealth(int mHealth){
     maxHealth = mHealth;
 
 }
+void Entity::resetOverkill(){
+    overkilled = false;
+
+}
+

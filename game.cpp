@@ -23,6 +23,11 @@ void Game::initialize() {
 void Game::processTurn() {
     switch (currentState){
         case gamestate::playerTurn:
+        if(getPlayer() != nullptr && getPlayer()->getOverkill()){
+            getPlayer()->resetOverkill();
+            advancePlayerTurn();
+        }
+
         break;
 
         case gamestate::worldTurn:
@@ -52,7 +57,6 @@ void Game::processTurn() {
                 }
             }
         }
-        //std::cout << "PLACEHOLDER ENEMY ATTACK TURN" << std::endl;
         currentState = gamestate::roundEnd;
         break;
 
@@ -74,7 +78,7 @@ void Game::draw() {
 
 void Game::update() {
 }
-//advances specifically player turn, seperate from process turn to allow for multiple players. GUI will handle this
+//advances specifically player turn, seperate from process turn to allow for multiple players. GUI will handle this... fucking spaghetti
 void Game::advancePlayerTurn(){
     if(getPlayer() && currentState == gamestate::playerTurn){
         playerIdx++;
