@@ -20,17 +20,16 @@ struct weaponDef{
 //different item types
 class Item{
     protected:
-    int id;
-    int value;
     std::string name; 
 
     public:
     virtual ~Item() = default;
+    std::string getIName() const {return name;}
 
 };
 
 class Weapon: public Item{
-    static std::unordered_map<std::string, weaponDef> weaponTable;
+    static const std::unordered_map<std::string, weaponDef> weaponTable;
 
     int baseDmg;
     statReq requirement;
@@ -38,7 +37,7 @@ class Weapon: public Item{
     damageType wDamageType;
 
     public:
-    Weapon(int, int, statReq, damageType);
+    Weapon(std::string);
 
     //getters
     int getDmg() const {return baseDmg;}

@@ -9,6 +9,7 @@
 class Player: public Entity {
     private:
     std::vector<std::unique_ptr<Item>> inventory; //store items
+    Weapon* equipped = nullptr;
 
 
     public:
@@ -16,6 +17,11 @@ class Player: public Entity {
     void addToInventory(std::unique_ptr<Item> item){
         inventory.push_back(std::move(item));
     }
+    void equipWeapon(int);
+
+
+    //getters
+    Weapon* getEquipped() const {return equipped;}
 
    
 };

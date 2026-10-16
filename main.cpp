@@ -2,6 +2,7 @@
 #include "game.h"
 
 int main(){
+    //The main function of infinite debugging
     //currently testing different mechanics, game loop will go here once everything is set in place
     Game game;
     Player* currentPlayer;
@@ -70,6 +71,40 @@ int main(){
 
     sorcerer.attack(testTarget, 2);
     std::cout << testTarget.getHealth() << std::endl; // 20
+
+    //weapons testing
+    Weapon weapon("Bolter");
+    std::cout << "Damage: " << weapon.getDmg() << "\nRequired Stat Level: " <<weapon.getSLvl() << std::endl;
+    switch(weapon.getReq()){
+        case statReq::strength:
+        std::cout << "Required Stat: Strength" << std::endl;
+        break;
+
+        case statReq::precision:
+        std::cout << "Required Stat: Precision" << std::endl;
+        break;
+
+        case statReq::will:
+        std::cout << "Required Stat: Will" << std::endl;
+        break;
+    }
+    switch(weapon.getDType()){
+        case damageType::physical:
+        std::cout << "Damage Type: Physical" << std::endl;
+        break;
+
+        case damageType::psychic:
+        std::cout << "Damage Type: Psychic" << std::endl;
+    }
+    Player testplayer(1, 1, 1, 1, 1, 1, "test");
+    testplayer.addToInventory(std::make_unique<Weapon>(weapon));
+    testplayer.equipWeapon(0);
+    if(testplayer.getEquipped() != nullptr){
+        std::cout << testplayer.getEquipped()->getIName() << std::endl;
+
+    }
+
+
 
 
 }
