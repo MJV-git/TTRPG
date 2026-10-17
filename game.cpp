@@ -13,7 +13,9 @@ std::mt19937 gen(rd());
 std::uniform_int_distribution<int> secDist(2,9);
 //still don't fully understand it, magic mathematics number bullshit.
 //now if I ever need a random number anywhere i just create a uniform int distribution and name it, range it, and call it
-    
+
+
+
 
 void Game::initialize() {
     createSectors();

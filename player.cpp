@@ -1,5 +1,6 @@
 #include "player.h"
 #include <iostream>
+#include "random.h"
 
 
 Player::Player( int pHealth, int pArmor, int pStrength, int pPrecision, int pWill, int pSector, std::string pName) : Entity(pHealth, pArmor, pStrength, pPrecision, pWill, pSector, pName) {
@@ -21,5 +22,67 @@ void Player::equipWeapon(int index){
             equipped = weapon;
         }
     }
+
+}
+void Player::playerAttack(Entity* target){
+    if(target == nullptr){
+        std::cout << "No target." << std::endl;
+        return;
+    }
+    if(target->getSector() != getSector()){
+        std::cout << "Not in same sector" << std::endl;
+    }
+    if(getEquipped() == nullptr){
+        std::cout << "No weapon equipped" << std::endl;
+        return;
+    }
+    bool meetsRequirements = false;
+    damageType dmgType = getEquipped()->getDType();
+    int damage = getEquipped()->getDmg();
+    int requiredStatLvl = getEquipped()->getSLvl();
+    switch(getEquipped()->getReq()){
+
+        case statReq::strength:
+        if(strength >= requiredStatLvl){
+            meetsRequirements = true;
+            
+        }
+        damage+=strength;
+        break;
+
+        case statReq::precision:
+        if(precision >= requiredStatLvl){
+            meetsRequirements = true;
+            
+        }
+        damage+=precision;
+        break;
+
+        case statReq::will:
+        if(will >= requiredStatLvl){
+            meetsRequirements = true;
+            damage+=will;
+        }else{
+            if(strength >= 1){
+                meetsRequirements = true;
+            }
+            damage = 1;
+            damage+=strength;
+            dmgType = damageType::physical;
+        }
+        break;
+        }
+        if(meetsRequirements){
+            target->takeDamage(dmgType, damage);
+        }else{
+            if(diceRoller(2) == 1){
+                return;
+            }
+            else{
+                target->takeDamage(dmgType, damage);
+            }
+    }
+    
+    
 
 }

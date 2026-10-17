@@ -26,6 +26,7 @@ class Game{
 
 
     public:
+
     void checkEntityStatus();
     void advancePlayerTurn();
     Player* getPlayer();

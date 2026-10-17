@@ -53,16 +53,12 @@ int main(){
     std::cout << currentPlayer->getSector() << std::endl;
     std::cout << currentPlayer->getName() << std::endl;
     
-    /*damage test
-    Entity dummy(10, 0, 4, 4, 4, 4, "dummy");
-    dummy.takeDamage(damageType::psychic, 16);
-    dummy.getHealth();*/
 
     currentPlayer->takeDamage(damageType::physical, 20);
     std::cout << currentPlayer->getSector() << std::endl;
     
  
-    Entity testTarget(30, 4, 1, 1, 1, 2, "Test Target");
+    Entity testTarget(30, 1, 1, 1, 1, 2, "Test Target");
     Enemy tyranid("Tyranid", 2);
     Enemy sorcerer("Chaos Sorcerer", 2);
 
@@ -73,7 +69,7 @@ int main(){
     std::cout << testTarget.getHealth() << std::endl; // 20
 
     //weapons testing
-    Weapon weapon("Bolter");
+    Weapon weapon("Power Sword");
     std::cout << "Damage: " << weapon.getDmg() << "\nRequired Stat Level: " <<weapon.getSLvl() << std::endl;
     switch(weapon.getReq()){
         case statReq::strength:
@@ -96,13 +92,18 @@ int main(){
         case damageType::psychic:
         std::cout << "Damage Type: Psychic" << std::endl;
     }
-    Player testplayer(1, 1, 1, 1, 1, 1, "test");
+    Player testplayer(1, 4, 5, 1, 5, 2, "test");
     testplayer.addToInventory(std::make_unique<Weapon>(weapon));
     testplayer.equipWeapon(0);
+    Entity* targetPtr = &testTarget;
     if(testplayer.getEquipped() != nullptr){
         std::cout << testplayer.getEquipped()->getIName() << std::endl;
+        std::cout << targetPtr->getHealth() << std::endl;
+        testplayer.playerAttack(targetPtr);
+        std::cout << targetPtr->getHealth() << std::endl;
 
     }
+
 
 
 
