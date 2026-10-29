@@ -1,57 +1,228 @@
-# 40krpg
+40krpg - THE LAST WATCH
+Current playable game: plain-text guide
 
-██╗  ██╗ ██████╗ ██╗  ██╗██████╗ ██████╗  ██████╗
-██║  ██║██╔═████╗██║ ██╔╝██╔══██╗██╔══██╗██╔════╝
-███████║██║██╔██║█████╔╝ ██████╔╝██████╔╝██║  ███╗
-╚════██║████╔╝██║██╔═██╗ ██╔══██╗██╔═══╝ ██║   ██║
-     ██║╚██████╔╝██║  ██╗██║  ██║██║     ╚██████╔╝
-     ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝      ╚═════╝
-⠀⢀⠀⢀⣀⣠⣤⣤⣤⣤⣤⣀⣀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣠⣠⣤⣤⣤⣤⣀⠲⢦⣄⡀⠀⠀
-⡶⢟⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠰⣷⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣬⡛⢷⣔
-⣾⡿⠟⠋⠉⠁⠀⡀⠀⠀⠀⠀⠈⠉⠉⠙⠛⢻⠛⠛⠋⠀⠀⠀⠀⠀⠀⠀⠈⠙⢛⣛⣛⣛⣛⣉⢉⣉⡀⠀⠀⠀⠀⠀⠈⠉⠛⢿⣷⣝
-⠃⠀⠀⠀⠀⠀⠀⣛⣛⣛⣛⣛⣛⢛⡛⠛⠛⠛⣰⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣌⠛⠛⢛⣛⣛⣛⣛⣛⣛⣛⣓⣀⠀⠀⠀⠀⠀⠈⢻
-⠀⠀⠀⢀⣤⡾⠛⢻⣿⣿⣿⡿⣿⡟⢻⣿⠳⠆⠘⣿⣦⠀⠀⠀⠀⠀⠀⠀⣰⣿⠁⠐⠛⣿⡟⢻⣿⣿⣿⣿⢿⣟⠛⠻⣦⣀⠀⠀⠀⠀
-⠀⠀⢴⠿⣧⣄⣀⣘⣿⣿⣿⣿⣿⡿⣀⡙⢷⠀⢀⡿⠁⠀⠀⠀⠀⠀⠀⠀⠈⢻⡖⠀⣾⣋⣀⣺⣿⣿⣿⣿⣿⣏⣀⣤⣴⠿⢷⠀⠀⠀
-⠀⠀⠀⠀⠈⠉⠉⠉⠉⠉⠉⠙⠉⠉⠉⠉⠛⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠋⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣼⠆⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⣿⠉⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⡿⠁⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣿⠆⠀⠀⢀⣿⠁⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣶⠟⠁⠀⠀⠀⣾⠇⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣤⣤⣴⣶⣾⠿⠛⠋⠀⠀⠀⠀⠀⢸⡟⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠿⠟⠛⠛⠛⠛⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠇⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⠋⠀⠀⠀⠀⠀⠀⠀
+A local C++17 strategy RPG for 1-4 defenders sharing one computer. Play
+through the native SDL2 GUI or terminal; both use the same engine and saves.
+There is no network multiplayer. This implementation includes AI-assisted
+code. README.md contains the full weapon, enemy, event, and route tables,
+screenshots, source layout, and test instructions.
 
+START PLAYING
 
-Warhammer RPG/VTT Arkham Horror Style Dev Plan
-(Most Ambitious Version)
+  ./play.sh                     Build and open the GUI title screen
+  ./play.sh --quick --seed 42    Start a seeded solo game against Khorne
+  ./play.sh --cli                Build and play the terminal version
+  ./play.sh --load 'patrol.sav'  Load a named campaign in the GUI
 
-Game systems and gameplay loop:
--	Main gameplay loop summary: select a boss and playable character and prevent boss from spawning by defeating portals and enemies in sectors before the turn limit is reached. Card and dice-based events are key gameplay mechanics. Players will use items and weapons to defeat enemies and close portals to avoid raising the chaos levels and prevent the boss from spawning.
--	Setup: create or select the player characters, create the fixed sectors and populate the board with starting enemies, and select the boss before the first round begins.
--	Cards are random world events. Draw and resolve one shared card per round, after every player has taken an action. Events can spawn enemies or portals, grant items, increase or decrease stats, advance the turn count extra, raise chaos, or move enemies.
--	Dice rolls are used as a combat tool in a D&D like hit or miss turn based combat that uses acquired items and weapons of varying strength and effects.
--	The Boss is the main enemy of the game. It is selected by the player at the beginning of the game and changes the difficulty of the game based off of boss chosen. The boss will spawn and fight the player after a set number of turns based off of boss selected. Players must prevent the boss from spawning or defeat the boss to win the game. Some bosses will have different mechanics depending on boss selected (IE Tzeench will have 2 additional portals at game start, Slaanesh will cause enemies to have an extra attack per turn, Nurgle will have enemies cause damage over time effects)
--	The Playable Character is the character that is either selected or created by the player. The player will use the character to navigate the sectors of the map and defeat enemies. Player characters will have their own unique stats (either chosen or preassigned) such as Armor (Reduces incoming physical damage), Health (Overall HP count), Strength (Scales melee hit chance and meets weapon requirements), Precision (Scales ranged hit chance), and Will (Reduces incoming psychic damage, meets staff psychic-use requirements, and provides resistance to chaos). Weapon damage is determined by the weapon; Strength and Precision affect the relevant hit chance rather than adding damage.
-o	If selected preset weapons are assigned to player based off character selected (Space Marine gets Heavy bolter vs Guardsman gets Las-gun)
-o	If created standard basic weapon will be given to all starting characters (Everyone gets bolter pistol)
--	Enemies are hostile creatures placed in different sectors. They attack during the enemy phase, after the shared world event resolves. Each living enemy with eligible players in its sector randomly selects one of those players to attack. Enemies choose independently, so multiple enemies may target the same player. If a player's health reaches zero, they are sent to the infirmary and receive no further attacks that phase; subsequent enemies select from the remaining eligible players in their sectors, or skip attacking if none remain. Enemies normally remain in their sectors, but world-event cards can move them. Upon game start 2 enemies are spawned randomly. Players have 5 rounds to orient and arm themselves before a significant number of enemies spawn from the portals.
--	Sectors are different areas of the map where events can occur, sectors are named and depending on the sector different enemies and items can be found there. The map will use a fixed layout of 9 sectors with predefined connections instead of random map generation. Portals and enemies will be randomly placed in sectors. (IE Space Marine Barracks, Imperial Bridge, Cathedral of the Omnissiah)
--	GUI direction (tentative): use SDL2 for a basic graphical interface, representing sectors and entities as rectangles.
- 
--	Round sequence: each player takes one action in player order, then one shared world-event card resolves, then enemies attack players in their resulting sectors. Moving to another sector uses the player's action, as does searching for items or attacking an enemy; movement is not an additional free step. After the enemy phase, the turn count increases by one for the whole round, plus any additional advances from events or chaos. Individual player actions and enemy attacks do not each add a turn. The next round then begins with the first player. The boss determines the turn limit and spawns when the turn count reaches that threshold.
--	Items and Weapons can be acquired by the player via scavenging, killing enemies, closing portals, and randomly dropped every turn. Weapons will have a set damage attached to them; players will roll dice to see if a weapon attack hits. Items will always hit/work depending on the item type.
--	Damage types: attacks deal physical or psychic damage. The weapon determines the damage amount. Armor subtracts its stat value from incoming physical damage; Will subtracts its stat value from incoming psychic damage in the same way. Either resistance can reduce damage to zero, even on a successful hit. Final damage cannot be negative: excess resistance does not restore health.
--	Weapon accuracy and requirements: melee hit chance scales with Strength, while ranged hit chance scales with Precision. Weapons have stat requirements, which are separate from the stat used for accuracy.
-o	A bolter rifle requires at least 3 Strength to wield without penalty, while its hit chance scales with Precision.
-o	A power sword requires 2 Strength to wield, and its hit chance scales with Strength.
-o	Staff weapons can deal psychic damage when the wielder has at least 3 Will. Below 3 Will, the staff instead deals low physical damage and uses Strength for its hit chance.
--	Combat details still to define: the exact hit-chance scaling, the below-requirement penalty for a bolter rifle, what happens below the power sword's requirement, psychic staff hit-chance calculation, and staff damage values.
--	Defeating Enemies and Closing Portals is done by reducing the HP to zero. Players will use weapons and items to do so (IE Bolter Rifle Weapon does 3 HP damage or Krak Grenade Item instantly kills target) Portals will summon 2 enemies every 5 turns. Portals cannot attack and require enemies to protect them. Attacks on unguarded portals will always hit.
--	Chaos is a mechanic that affects the amount of damage that enemies do as well as function as a turn accelerator. If a character is reduced to 0 health, remaining attacks against that character stop immediately, they recover in the infirmary sector, and the chaos level goes up by one. The boss will now spawn faster because the turn counter will be accelerated by the chaos level and enemies will do extra damage based off of chaos level. (IE chaos level 2 adds 2 extra to the turn counter each round, and the player will take an extra 2 damage from enemies)
+The GUI needs a C++17 compiler, CMake 3.16+, pkg-config, SDL2, FreeType,
+a local TrueType/OpenType font, and Bash for the launcher. The terminal
+build needs no SDL2 or FreeType. No account or asset downloads are needed.
+The ./ttrpg wrapper also launches the GUI. After building, launch
+./build/ttrpg_gui directly to skip the build step.
 
-AI DISCLAIMER NOTE: This project does not contain AI generated code, AI has been used to add information to the README as development continues.
+TITLE SCREEN AND CHARACTERS
+
+- New campaign: choose a Chaos god and create a squad of 1-4 defenders.
+- Quick deployment: use the title-screen 1-4 player selector to deploy
+  distinct presets with varied callsigns. The lead preset rotates between
+  deployments. The command-line --quick option starts only one defender.
+- Tutorial: 12 guided lessons on a separate practice board. Exit tutorial
+  or Escape returns to the menu without changing your campaign or save.
+- Field manual: ten topics, including a dedicated Bridge collapse page.
+
+Presets are Space Marine, Guardsman, Sanctioned Psyker, and Sister of Battle.
+Use the left/right arrows to cycle in either direction. Custom characters
+have a 50-point budget; increases beyond the budget are disabled. Choose
+one of the presets' starting weapons. Everyone also starts with a bolter
+pistol, a medkit, and a krak grenade; Guardsmen get an extra grenade.
+Hold Backspace to erase text repeatedly in name fields.
+
+ROUNDS AND CONTROLS
+
+Each living defender takes one action, then the shared world card is drawn
+and flipped. Read it and choose Resolve world event. Existing rot ticks,
+enemies activate individually, and the god acts last if present. Internal
+upkeep advances doom, processes reinforcements, and begins the next round.
+Upkeep has no player-facing phase. The terminal resolves phases automatically.
+
+The active defender's map icon blinks green. Click sectors to inspect them
+for free. Click Move to follow an allowed outgoing route; arrowheads show
+direction. Some roads are one-way. Attacks require a target in your sector.
+Defender orders act at your location even while you inspect another sector.
+
+Movement, attacking, searching, resting, medkits, grenades, Guard, Suppress,
+Market purchases, and waiting normally spend your action. Equipping,
+trading, inspecting, and outgoing road moves from Streets are free.
+Guard reduces incoming physical/psychic hits by 3 before resistance for
+that round. Suppress uses a ranged hit roll to skip an enemy's next
+activation without dealing damage.
+
+Use Equipment to equip weapons or Trade with another living defender in
+your sector. Give a weapon, medkit, or grenade for free. Keep at least one
+weapon; duplicate weapons cannot transfer. Supplies transfer one at a time.
+
+GUI shortcuts: 1-9 inspect sectors; I opens Equipment; H opens the manual;
+J opens the journal; F5 saves; Escape closes dialogs or opens Menu.
+Menu controls animation speed. Cards wait for confirmation; phase banners
+close automatically. Actions have animations. Low health flashes a red
+outline on the defender panel; the battlefield UI turns red for the god.
+
+COMBAT AND RECOVERY
+
+Weapon hit chance starts at 80% when requirements are met exactly.
+Subtract 20 percentage points per unmet requirement, regardless of how
+many stat points are missing. Add 5 percentage points per surplus point
+in the aiming stat: Strength for melee, Precision for ranged, Will for
+psychic weapons. Heavy weapon Strength is a requirement, not an extra
+accuracy bonus. Final chance is capped between 0% and 100%.
+Example: a Strength 5 defender using a Strength 2 sword has 95% accuracy.
+
+Weapons have fixed base damage, modified by sector bonuses. Armor reduces
+physical damage; Will reduces psychic damage; true damage ignores both.
+Krak grenades always hit: they destroy a portal outright or deal 5 true
+damage to an enemy or god (10 in Armory). Rift Wardens block weapon damage
+to local portals but cannot stop grenades. Unguarded portals are automatic
+weapon hits; guarded portals require the normal weapon hit roll.
+
+Ordinary defeat sends a defender to Infirmary at full HP, clears rot, and
+adds 1 chaos. They cannot be attacked again during that hostile phase.
+Bridge collapse is the permanent-death exception described below.
+Rest heals 5 HP; Infirmary rest fully heals and cures rot. A medkit heals
+8 HP and cures rot. Rot deals 1 true damage per round for its duration.
+Only world events can lower chaos; there are no prayer or seal actions.
+
+SECTORS
+
+  1 Barracks   +2 armor for defenders.
+  2 Armory     +5 true damage on successful defender hits, including grenades.
+  3 Alley      +20 percentage points to defender ranged accuracy.
+  4 Streets    Outgoing road movement is free. Non-road flights cost an action.
+  5 Cathedral  +4 Will for defenders, including resistance and weapon accuracy.
+  6 Infirmary  Rest fully heals and cures rot.
+  7 Slums      +2 physical damage to all melee attacks, including enemies/gods.
+  8 Market     Choose one of three items for an action. Offers refresh each
+               defender turn; viewing or loading does not reroll them.
+  9 Bridge     Can be destroyed permanently with a krak grenade.
+
+BRIDGE COLLAPSE
+
+Stand on Bridge with a krak grenade. Choose Collapse Bridge and confirm.
+This costs one grenade and your action. Throwing a grenade at a target
+does not destroy the Bridge.
+
+- If the god is ON BRIDGE when it collapses, it loses half its CURRENT HP,
+  ignoring resistance, and moves to Slums. Damage rounds up: 56 HP becomes
+  28; 51 HP becomes 25. A god elsewhere takes no damage and does not move.
+- Every defender on Bridge dies PERMANENTLY, including the acting defender.
+  There is no Infirmary recovery or chaos increase. Regular enemies there
+  die, and local portals close.
+- Bridge stays inaccessible for the rest of the campaign, even during
+  Transport crew. With normal roads, Slums loses its only exit. Reversed
+  roads, Emergency Teleport, or Transport crew can offer an escape.
+- A god that appears after an earlier collapse starts in Slums without
+  taking collapse damage. Fallen defenders are skipped in turn order.
+- Losing the whole squad ends the campaign unless the god also dies;
+  killing the god takes victory priority. Collapse and deaths persist
+  across saves.
+
+PORTALS, EVENTS, AND ENDINGS
+
+Portals have 6 HP. Campaigns start with two portals, or four against
+Tzeentch, and TWO enemies per starting defender. Every fifth completed
+round, remaining portals spawn ONE enemy per LIVING defender globally,
+regardless of portal count. Portals without defenders receive priority.
+Reinforcements begin acting the following round.
+
+Before the god appears, destroying all portals while enemies remain starts
+last stand. The UI explains the change. Each enemy holds position and has
+one 10% summon chance per activation instead of attacking or moving.
+Suppression skips that activation. A successful summon restores normal
+behavior immediately. Once the god appears, last stand is permanently off.
+
+World draws have a 50% chance of A Moment of Silence. Otherwise a shuffled
+deck supplies 22 different events before reshuffling. Events can destroy
+portals or enemies, reverse roads, spawn threats, grant supplies, lower
+chaos, close sectors temporarily, transport defenders, or alter accuracy.
+No world card directly damages defenders. Benefits apply to living
+defenders and never revive permanent casualties. Transport crew permits
+flights to any sector except a destroyed Bridge through the next defender
+phase, ignoring roads and temporary closures.
+
+Doom rises by 1 + chaos each round; Lost Hours adds 2 more. The god manifests
+at its doom limit: Khorne 24, Tzeentch 32, Slaanesh 28, Nurgle 30. Boss base
+HP is respectively 50, 52, 50, and 60, plus 6 per STARTING defender. Each
+patron has two follower types and distinct rules; generic enemies include
+Wardens, hunters, and psychic attackers. Slaanesh grants double strikes;
+Nurgle's damaging hits inflict rot.
+
+Win by closing every portal and defeating every enemy, or by killing the
+god. Killing the god wins immediately regardless of other enemies/portals.
+Lose at chaos 6, when every defender is permanently dead, or after eight
+further rounds finish with the manifested god still alive.
+
+SAVING AND EXITING
+
+GUI saving is manual by default: Save, F5, or Archive writes a campaign.
+Menu offers separate save-and-exit and WITHOUT-saving choices for both
+title and desktop. Closing the window opens Menu. Optional Autosave writes
+accepted orders, trades, equipment changes, and phase advances. Quitting
+without saving cannot undo autosaves that have already been written.
+
+Default file: campaign.sav in the working directory (the project directory
+when using play.sh). Archive selects a named slot. Terminal commands include
+save, save my patrol.sav, load my patrol.sav, and quit. Paths can contain
+spaces; enter them without quotes in the prompt. Terminal quit or end of
+input saves; terminal play does not autosave every turn.
+
+Current save format: 6. Versions 1-5 can also be loaded. Saves preserve the
+turn phase, unresolved card, random state, Market offers, destroyed Bridge,
+and permanent deaths. Invalid loads leave the active campaign intact.
+
+BUILD AND CHECK
+
+These commands use Linux and Bash. Open a terminal in the project folder
+containing CMakeLists.txt and play.sh.
+
+1. Install dependencies (Debian/Ubuntu):
+
+  sudo apt update
+  sudo apt install build-essential cmake pkg-config libsdl2-dev libfreetype6-dev fonts-dejavu-core python3
+
+Other distributions need equivalent C++17 build tools, CMake 3.16+,
+pkg-config, SDL2 and FreeType development files, and a local font.
+Python 3 is optional; it enables frontend integration tests. Dependency
+installation requires network access; subsequent builds and play do not.
+
+2. Build and launch the GUI in one step:
+
+  bash ./play.sh
+
+Or configure, build, and launch separately:
+
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=ON -DBUILD_TESTING=ON
+  cmake --build build --parallel
+  ./build/ttrpg_gui
+
+Rerun the build command after editing source files. To play an existing
+build, run ./build/ttrpg_gui directly. If no font is found, use:
+
+  ./build/ttrpg_gui --font /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+
+3. For a terminal-only build:
+
+  cmake -S . -B build-cli -DCMAKE_BUILD_TYPE=Release -DBUILD_GUI=OFF -DBUILD_TESTING=ON
+  cmake --build build-cli --parallel
+  ./build-cli/ttrpg
+
+The shortcut is bash ./play.sh --cli. This version needs only the compiler,
+build tools, and CMake (Debian/Ubuntu: build-essential cmake). Python 3 is
+optional for tests; SDL2, FreeType, pkg-config, and fonts are unnecessary.
+
+4. Run tests after building:
+
+  ctest --test-dir build --output-on-failure
+
+For terminal-only tests, replace build with build-cli. Configure with
+-DBUILD_TESTING=OFF to omit tests. The game itself does not need Python.
+See README.md for test coverage, sanitizer builds, screenshots, and full
+gameplay tables.

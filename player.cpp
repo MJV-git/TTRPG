@@ -1,5 +1,12 @@
 #include "player.h"
-
-
-Player::Player( int pHealth, int pArmor, int pStrength, int pPrecision, int pWill, int pSector, std::string pName) : Entity(pHealth, pArmor, pStrength, pPrecision, pWill, pSector, pName) {
+#include <algorithm>
+bool Player::equip(WeaponId id) {
+    if (std::find(arsenal.begin(), arsenal.end(), id) == arsenal.end()) return false;
+    equipped = id;
+    return true;
+}
+bool Player::giveWeapon(WeaponId id) {
+    if (std::find(arsenal.begin(), arsenal.end(), id) != arsenal.end()) return false;
+    arsenal.push_back(id);
+    return true;
 }

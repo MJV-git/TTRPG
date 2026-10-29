@@ -1,84 +1,25 @@
 #include "entity.h"
-#include "map.h"
-#include "game.h"
+#include <algorithm>
+#include <stdexcept>
+#include <utility>
 
-
-//as it stands, all children of this class are identical, will see if there will need to even be specific children or if they can be consolidated as one, ECS maybe? I like my way but maybe worth.
-Entity::Entity( int eHealth, int eArmor, int eStrength, int ePrecision, int eWill, int eSector, std::string eName) : health(eHealth), armor(eArmor), strength(eStrength), precision(ePrecision), will(eWill), sector(eSector), name(eName), maxHealth(eHealth){
-}
-//actual movement
-void Entity::moveTo(int destination) {
-    sector = destination;
-    
+Entity::Entity(int hp, int a, int s, int p, int w, int location, std::string label)
+    : health(hp), armor(a), strength(s), precision(p), will(w), sector(location),
+      maxHealth(hp), name(std::move(label)) {
+    if (hp < 1 || a < 0 || s < 0 || p < 0 || w < 0 || location < 1 || location > 9)
+        throw std::invalid_argument("Invalid entity stats or sector.");
 }
 
-void Entity::kill() {
-    
+int Entity::takeDamage(damageType type, int amount) {
+    const int resistance = type == damageType::physical ? getArmor() :
+                           type == damageType::psychic ? getWill() : 0;
+    const int dealt = std::min(health, std::max(0, amount - resistance));
+    health -= dealt;
+    return dealt;
 }
-
-void Entity::spawn() {
+int Entity::heal(int amount) {
+    const int restored = std::min(maxHealth - health, std::max(0, amount));
+    health += restored;
+    return restored;
 }
-
-void Entity::takeDamage(damageType damageType, int damage){
-    //apply damage to selected entity
-    //if dead, don't attack
-    if (!isAlive){
-        return;
-    }
-    //deal damage based on enum damagetype thru armor
-    switch(damageType){
-        case damageType::physical:
-        damage -= armor;
-        break;
-
-        case damageType::psychic:
-        damage -= will;
-        break;
-    }
-    //if armor saves or not
-    if(damage > 0){
-        health -= damage;
-        std::cout << "Damage Taken: " << damage << std::endl;
-    }else{
-        std::cout << "No Damage Taken" << std::endl;
-    }
-    //death, TODO: change sector to infirmary somehow, most likely in game.cpp
-    if(health <= 0){
-        std::cout << "You have been defeated, for now..." << std::endl;
-
-
-        if (health <= -5){
-            std::cout << "They really messed you up, you will need a turn to recover..." << std::endl;
-            overKilled = true;
-        }
-
-        health = 0;
-        isAlive = false;
-        return;
-    }
-
-}
-void Entity::heal(){
-    health = maxHealth;
-    isAlive = true;
-}
-//getters
-
-bool Entity::getAlive(){
-    return isAlive;
-}
-int Entity::getHealth(){
-    return health;
-}
-int Entity::getSector(){
-    return sector;
-}
-std::string Entity::getName(){
-    return name;
-}
-
-//setters
-void Entity::setMaxHealth(int mHealth){
-    maxHealth = mHealth;
-
-}
+void Entity::heal() { health = maxHealth; }

@@ -1,16 +1,13 @@
 #pragma once
-
 #include <string>
 #include <vector>
-
-class Sector{
-    private:
-    int ID;//track sectors in sector vector
-    std::string name;//names
-    std::vector<int> destinations;//list valid destinations per sector IE sector 1 can go to: 2,6,5 search vector for these values when check connecting.
-
-
-    public:
-    Sector(int, std::string, std::vector<int>);
-    bool checkConnecting(int);//validate sectors are connected
+struct Sector {
+    int id;
+    std::string name;
+    std::vector<int> destinations;
+    bool checkConnecting(int destination) const;
 };
+const std::vector<Sector>& sectors();
+const Sector& sectorAt(int id);
+std::vector<int> outgoingRoutes(int sector, bool reversed = false);
+int nextStep(int from, int to, bool reversed = false);
