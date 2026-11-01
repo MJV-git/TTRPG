@@ -1,7 +1,7 @@
 #pragma once
 #include "entity.h"
 #include <vector>
-enum class BossId { khorne, tzeentch, slaanesh, nurgle };
+enum class BossId { emberRegent, prismOracle, echoWeaver, rustGardener };
 struct BossDef {
     BossId id;
     std::string name, title, rule;

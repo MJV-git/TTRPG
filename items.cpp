@@ -3,16 +3,16 @@
 #include <stdexcept>
 const std::vector<Weapon>& weapons() {
     static const std::vector<Weapon> values {
-        {WeaponId::pistol, "Bolter pistol", 3, damageType::physical, Accuracy::precision, 0, 2},
-        {WeaponId::lasgun, "Lasgun", 4, damageType::physical, Accuracy::precision, 0, 2},
-        {WeaponId::bolter, "Bolter rifle", 5, damageType::physical, Accuracy::precision, 0, 2},
-        {WeaponId::sword, "Power sword", 6, damageType::physical, Accuracy::strength, 2},
-        {WeaponId::heavyBolter, "Heavy bolter", 7, damageType::physical, Accuracy::precision, 4, 2},
-        {WeaponId::staff, "Force staff", 7, damageType::psychic, Accuracy::will, 0, 0, 3},
-        {WeaponId::marksmanBolter, "Marksman bolter", 10, damageType::physical, Accuracy::precision, 0, 5},
-        {WeaponId::plasmaGun, "Heavy plasma gun", 12, damageType::physical, Accuracy::precision, 4, 3},
-        {WeaponId::thunderHammer, "Thunder hammer", 11, damageType::physical, Accuracy::strength, 5},
-        {WeaponId::forceHalberd, "Force halberd", 11, damageType::psychic, Accuracy::will, 0, 0, 5}
+        {WeaponId::pistol, "Rivet pistol", 3, damageType::physical, Accuracy::precision, 0, 2},
+        {WeaponId::beamCarbine, "Beam carbine", 4, damageType::physical, Accuracy::precision, 0, 2},
+        {WeaponId::rivetRifle, "Rivet rifle", 5, damageType::physical, Accuracy::precision, 0, 2},
+        {WeaponId::sword, "Arc blade", 6, damageType::physical, Accuracy::strength, 2},
+        {WeaponId::rotaryRiveter, "Rotary riveter", 7, damageType::physical, Accuracy::precision, 4, 2},
+        {WeaponId::staff, "Resonance staff", 7, damageType::psychic, Accuracy::will, 0, 0, 3},
+        {WeaponId::needleRifle, "Needle rifle", 10, damageType::physical, Accuracy::precision, 0, 5},
+        {WeaponId::thermalCannon, "Thermal cannon", 12, damageType::physical, Accuracy::precision, 4, 3},
+        {WeaponId::pileMaul, "Pile maul", 11, damageType::physical, Accuracy::strength, 5},
+        {WeaponId::resonanceGlaive, "Resonance glaive", 11, damageType::psychic, Accuracy::will, 0, 0, 5}
     };
     return values;
 }
@@ -37,7 +37,7 @@ std::string weaponRequirements(WeaponId id) {
 std::string consumableName(Consumable item) {
     switch (item) {
         case Consumable::medkit: return "Medkit";
-        case Consumable::grenade: return "Krak grenade";
+        case Consumable::grenade: return "Breach grenade";
     }
     throw std::invalid_argument("Unknown consumable.");
 }

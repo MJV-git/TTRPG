@@ -68,7 +68,7 @@ class Game {
     std::vector<std::string> log;
     std::vector<CombatEvent> combatEvents;
     std::size_t playerIdx = 0;
-    int round = 1, doom = 0, chaos = 0, finalRounds = 0, nextEnemyId = 1;
+    int round = 1, doom = 0, instability = 0, finalRounds = 0, nextEnemyId = 1;
     int kills = 0, closed = 0;
     bool started = false;
     Outcome outcome = Outcome::ongoing;
@@ -103,10 +103,10 @@ class Game {
     std::vector<std::size_t> targetsAt(int sector) const;
 
 public:
-    explicit Game(BossId patron = BossId::khorne, std::uint32_t seed = std::random_device{}());
+    explicit Game(BossId patron = BossId::emberRegent, std::uint32_t seed = std::random_device{}());
     static Game tutorial(int sector = 1);
     bool addPreset(int preset, const std::string& name);
-    bool addCustom(int vitality, int armor, int strength, int precision, int will, const std::string& name, WeaponId startingWeapon = WeaponId::lasgun);
+    bool addCustom(int vitality, int armor, int strength, int precision, int will, const std::string& name, WeaponId startingWeapon = WeaponId::beamCarbine);
     static int statCost(int value);
     void start();
     ActionResult act(Action action, bool automatic = true);
@@ -145,7 +145,7 @@ public:
     std::size_t getPlayerIndex() const { return playerIdx; }
     int getRound() const { return round; }
     int getDoom() const { return doom; }
-    int getChaos() const { return chaos; }
+    int getInstability() const { return instability; }
     int livingDefenders() const;
     int getFinalRounds() const { return finalRounds; }
     int getKills() const { return kills; }

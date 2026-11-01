@@ -61,8 +61,8 @@ void title() {
               << "  4 0 K R P G  /  T H E  L A S T  W A T C H\n"
               << "  ========================================\n" << reset()
               << "  Nine sectors. One city. A dying light.\n\n"
-              << "  The void shields have failed. Beneath the streets, the warp stirs.\n"
-              << "  Lead the last defenders, close the rifts, and hold back a god.\n\n";
+              << "  The perimeter relays have failed. Beneath the streets, the breach stirs.\n"
+              << "  Lead the last defenders, close the rifts, and hold back a sovereign.\n\n";
 }
 void help() {
     std::cout << cyan() << "  ORDERS / one action per defender per round\n" << reset()
@@ -71,8 +71,8 @@ void help() {
               << "  portal          Attack your sector's portal (6 HP)\n"
               << "  boss            Attack the manifested boss in your sector\n"
               << "  search          Search for loot; Armory favors weapons\n"
-              << "  rest            Recover 5 HP; Infirmary fully heals and cures rot\n"
-              << "  medkit          Consume a medkit: recover 8 HP and cure rot\n"
+              << "  rest            Recover 5 HP; Infirmary fully heals and cures corrosion\n"
+              << "  medkit          Consume a medkit: recover 8 HP and cure corrosion\n"
               << "  grenade TARGET  TARGET: enemy ID, portal, or boss; always hits\n"
               << "  guard           Reduce incoming enemy damage by 3 this round\n"
               << "  suppress ID     Ranged hit: enemy skips its action, no damage dealt\n"
@@ -88,15 +88,15 @@ void help() {
 void rules() {
     std::cout << gold() << "  FIELD MANUAL\n" << reset()
               << "  Win by closing ALL portals and defeating ALL enemies, including\n"
-              << "  the boss if present. Slaying the god also wins immediately.\n"
+              << "  the boss if present. Slaying the sovereign also wins immediately.\n"
               << "  If doom reaches the boss deadline, defeat its avatar within 8 rounds.\n"
-              << "  Chaos 6 or the end of that final countdown means defeat.\n\n"
+              << "  Instability 6 or the end of that final countdown means defeat.\n\n"
               << "  Starting enemies: two per defender (2/4/6/8 total).\n"
-              << "  Each player takes ONE action. Then: one shared event, rot damage,\n"
-              << "  enemy attacks, and doom advances by 1 + chaos. Lost Hours adds 2.\n"
+              << "  Each player takes ONE action. Then: one shared event, corrosion damage,\n"
+              << "  enemy attacks, and doom advances by 1 + instability. Lost Hours adds 2.\n"
               << "  Every fifth round, portals spawn one enemy per defender GLOBALLY.\n"
               << "  Portals without defenders take priority. New enemies act next round.\n"
-              << "  Rift Acolytes attack local defenders with psychic spells.\n\n"
+              << "  Breach tuners attack local defenders with psychic pulses.\n\n"
               << "  Routes are directional. A sector lists only its outgoing exits;\n"
               << "  entering from another sector does not guarantee a return route.\n"
               << "  Twisting Streets temporarily reverses one-way roads. All movement\n"
@@ -110,28 +110,28 @@ void rules() {
               << "  weapon chance. World conditions can temporarily reduce accuracy.\n"
               << "  Grenades destroy portals, or deal 5 to enemies and bosses,\n"
               << "  ignoring resistance. Attacks and items target only your sector.\n"
-              << "  Rift Wardens block weapon damage to portals until defeated.\n"
+              << "  Gate anchors block weapon damage to portals until defeated.\n"
               << "  Grenades bypass the shield; suppression does not break it.\n\n"
-              << "  Enemies roll to hit and independently choose a local player. Chaos\n"
+              << "  Enemies roll to hit and independently choose a local player. Instability\n"
               << "  adds to their raw damage. At zero HP you recover in the Infirmary\n"
-              << "  with full HP, lose rot, and add 1 chaos. You cannot be attacked again\n"
+              << "  with full HP, lose corrosion, and add 1 instability. You cannot be attacked again\n"
               << "  that phase. You can act normally next round.\n"
               << "  The boss starts at the Bridge. If no eligible defender is there,\n"
               << "  it moves toward the closest one, spending its attacks to move.\n\n"
               << "  Searching spends an action to find loot. Enemy kills may drop loot; closing\n"
-              << "  a portal grants a medkit. Only world events can lower chaos. Each round\n"
+              << "  a portal grants a medkit. Only world events can lower instability. Each round\n"
               << "  with a non-quiet event has a 25% bonus supply chance. Equipping is free.\n"
               << "  Half of card draws are quiet; 22 other events form a shuffled deck.\n\n"
               << "  Guard reduces incoming hits by 3 before resistance this round.\n"
               << "  Suppress with a ranged weapon: roll weapon accuracy to skip\n"
               << "  its next activation without damage, including a last-stand ritual.\n"
-              << "  Plague Drones inflict rot on damaging hits. Suppress or eliminate\n"
+              << "  Rust drones inflict corrosion on damaging hits. Suppress or eliminate\n"
               << "  them early; medkits and Infirmary rest cure infections.\n\n"
-              << "  FIRST PATROL: Space Marine + Khorne. Look for a nearby rift, move\n"
+              << "  FIRST PATROL: Bulwark + Ember Regent. Look for a nearby rift, move\n"
               << "  there, and use 'portal' or 'grenade portal'. Don't spend all five\n"
               << "  opening rounds scavenging. Save grenades for guarded portals or\n"
-              << "  armored enemies. Protect defenders: chaos increases are lasting.\n\n"
-              << "  BEFORE THE GOD: With no portals, enemies hold position and each\n"
+              << "  armored enemies. Protect defenders: instability increases are lasting.\n\n"
+              << "  BEFORE THE SOVEREIGN: With no portals, enemies hold position and each\n"
               << "  has a 10% summon chance per hostile activation instead of acting.\n"
               << "  Suppression skips the activation. A new portal restores normal\n"
               << "  behavior. Boss arrival ends rituals permanently, even with no portals.\n\n";
@@ -150,12 +150,12 @@ void inventory(const Game& game) {
         std::cout << '\n';
     }
     std::cout << "  Medkits: " << p.getSupply(Consumable::medkit)
-              << " | Krak grenades: " << p.getSupply(Consumable::grenade) << "\n\n";
+              << " | Breach grenades: " << p.getSupply(Consumable::grenade) << "\n\n";
 }
 void board(const Game& game) {
     std::cout << '\n' << gold() << "  SECTOR COMMAND / " << game.getBossDef().title << reset() << '\n'
               << "  Round " << game.getRound() << "  |  Doom " << game.getDoom() << '/' << game.getBossDef().deadline
-              << "  |  Chaos " << game.getChaos() << "/6  |  Portals " << game.getPortals().size();
+              << "  |  Instability " << game.getInstability() << "/6  |  Portals " << game.getPortals().size();
     if (game.hasLivingBoss()) std::cout << red() << "  |  FINAL ROUNDS " << game.getFinalRounds() << reset();
     else std::cout << "  |  Next wave after round " << ((game.getRound() - 1) / 5 + 1) * 5;
     std::cout << "\n  " << dim() << game.getBossDef().rule << reset() << '\n'
@@ -185,7 +185,7 @@ void board(const Game& game) {
         const auto& p = game.getPlayers()[i];
         std::cout << "  P" << i + 1 << ' ' << p.getName() << ' ' << healthBar(p.getHealth(), p.getMaxHealth())
                   << ' ' << p.getHealth() << '/' << p.getMaxHealth() << " HP  /  " << weapon(p.getWeapon()).name;
-        if (p.getPoison()) std::cout << red() << "  ROT:" << p.getPoison() << reset();
+        if (p.getPoison()) std::cout << red() << "  CORROSION:" << p.getPoison() << reset();
         std::cout << '\n';
     }
 }
@@ -247,7 +247,7 @@ std::optional<Game> createGame(std::uint32_t seed) {
         }
         if (*preset != 5) game.addPreset(*preset - 1, *name);
         else {
-            std::cout << "  Starting weapon: 1 Heavy bolter, 2 Lasgun, 3 Force staff, 4 Power sword\n";
+            std::cout << "  Starting weapon: 1 Rotary riveter, 2 Beam carbine, 3 Resonance staff, 4 Arc blade\n";
             const auto starting = choose("  Weapon [1-4]: ", 1, 4);
             if (!starting) return std::nullopt;
             std::cout << "  Enter five stats: Vitality Armor Strength Precision Will.\n"
@@ -277,7 +277,7 @@ void play(Game game, std::string savePath) {
         if (game.getOutcome() != Outcome::ongoing) {
             std::cout << '\n' << gold() << "  " << game.getEnding() << reset() << '\n'
                       << "  Debrief: " << game.getClosed() << " portals sealed, " << game.getKills() << " enemies defeated, "
-                      << "round " << game.getRound() << ", chaos " << game.getChaos() << ".\n"
+                      << "round " << game.getRound() << ", instability " << game.getInstability() << ".\n"
                       << "  Start another patrol with ./play.sh\n\n";
             return;
         }
@@ -332,8 +332,8 @@ void play(Game game, std::string savePath) {
             continue;
         }
         if (command=="collapse" && argument!="confirm") {
-            std::cout << "  Destroying Bridge costs a krak grenade and PERMANENTLY KILLS all defenders there.\n"
-                      << "  Enemies on Bridge die. ONLY a god on Bridge loses half current HP and moves to Slums.\n"
+            std::cout << "  Destroying Bridge costs a breach grenade and PERMANENTLY KILLS all defenders there.\n"
+                      << "  Enemies on Bridge die. ONLY a sovereign on Bridge loses half current HP and moves to Slums.\n"
                       << "  Bridge stays inaccessible. Stand on Bridge and type: collapse confirm\n";
             continue;
         }
@@ -396,8 +396,8 @@ int main(int argc, char** argv) {
                 const auto parsed = std::from_chars(value.data(), value.data() + value.size(), seed);
                 if (parsed.ec != std::errc{} || parsed.ptr != value.data() + value.size()) throw std::runtime_error("Seed must be an unsigned 32-bit integer.");
             } else if (arg == "--help" || arg == "-h") {
-                std::cout << "40krpg / The Last Watch\nUsage: ttrpg [--quick] [--seed N] [--load PATH] [--no-color]\n"
-                          << "  --quick     Deploy a random preset defender against Khorne\n"
+                std::cout << "Veyra / The Last Watch\nUsage: ttrpg [--quick] [--seed N] [--load PATH] [--no-color]\n"
+                          << "  --quick     Deploy a random preset defender against Ember Regent\n"
                           << "  --seed N    Repeat a starting scenario (same build and commands)\n"
                           << "  --load PATH Resume a saved campaign\n"
                           << "  --no-color  Plain terminal output\n";
@@ -408,7 +408,7 @@ int main(int argc, char** argv) {
         title();
         if (!loadPath.empty()) { play(loadCampaign(loadPath), loadPath); return 0; }
         if (quick) {
-            Game game(BossId::khorne, seed);
+            Game game(BossId::emberRegent, seed);
             const auto recruit = quickDefender(seed); game.addPreset(recruit.preset, recruit.name); game.start();
             play(std::move(game), defaultSave); return 0;
         }

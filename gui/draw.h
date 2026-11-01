@@ -21,10 +21,10 @@ inline constexpr Color purple {169, 128, 203};
 
 enum class Icon {
     barracks, armory, alley, streets, cathedral, infirmary, slums, market, bridge,
-    marine, guardsman, psyker, sister, defender, portal,
-    cultist, chaosMarine, sorcerer, acolyte, warden, hound, drone,
-    bloodletter, fleshHound, horror, flamer, daemonette, fiend, plaguebearer, beast,
-    khorne, tzeentch, slaanesh, nurgle, insignia, supplies, search, shield, clock, grenade, skull
+    bulwark, trailguard, resonant, duskblade, defender, portal,
+    scavenger, siegeAutomaton, signalLeech, breachTuner, anchor, wireStalker, rustDrone,
+    kilnSentinel, cinderTracker, prismMote, refractionCrawler, echoRunner, harmonicProwler, rustCarrier, orchardCrawler,
+    emberRegent, prismOracle, echoWeaver, rustGardener, insignia, supplies, search, shield, clock, grenade, skull
 };
 Icon sectorIcon(int sector);
 Icon defenderIcon(const Player& player);

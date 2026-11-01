@@ -23,9 +23,9 @@ int main(int argc, char** argv) {
                 if (parsed.ec != std::errc{} || parsed.ptr != value.data() + value.size()) throw std::runtime_error("Seed must be an unsigned 32-bit integer.");
                 fixed = true;
             } else if (option == "--help" || option == "-h") {
-                std::cout << "The Last Watch / graphical edition\n"
+                std::cout << "Veyra / The Last Watch / graphical edition\n"
                           << "Usage: ttrpg_gui [--quick] [--seed N] [--load PATH] [--font PATH]\n"
-                          << "  --quick        Deploy a varied preset defender against Khorne\n"
+                          << "  --quick        Deploy a varied preset defender against Ember Regent\n"
                           << "  --seed N       Choose a repeatable scenario\n"
                           << "  --load PATH    Resume a terminal or graphical save\n"
                           << "  --font PATH    Use a local TrueType/OpenType font\n"
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) throw std::runtime_error(SDL_GetError());
         initialized = true;
         auto window = std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)>(
-            SDL_CreateWindow("40krpg - The Last Watch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            SDL_CreateWindow("Veyra - The Last Watch", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                              ui::Width, ui::Height, SDL_WINDOW_RESIZABLE | (smoke || !screenshot.empty() ? SDL_WINDOW_HIDDEN : SDL_WINDOW_SHOWN)), SDL_DestroyWindow);
         if (!window) throw std::runtime_error(SDL_GetError());
         SDL_SetWindowMinimumSize(window.get(), 960, 640);

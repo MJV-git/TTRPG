@@ -1,7 +1,7 @@
 #pragma once
 #include "entity.h"
 #include <vector>
-enum class EnemyRole { fighter, acolyte, warden, hunter, infector, plagueHunter };
+enum class EnemyRole { fighter, breachTuner, anchor, hunter, infector, rustHunter };
 struct EnemyDef {
     std::string name;
     int health, armor, strength, precision, will;
@@ -24,5 +24,5 @@ public:
     const EnemyDef& definition() const { return enemyDefinitions().at(kind); }
     damageType getAttackType() const;
     int getAttackDamage() const;
-    int attack(Entity& target, int chaosBonus) const;
+    int attack(Entity& target, int instabilityBonus) const;
 };

@@ -291,7 +291,7 @@ void Gui::actionAnimation() {
             (t < 0.65F ? "SUMMONING..." : game->getPortals().empty() ? "RITUAL FAILED" : "PORTAL SUMMONED") : "HOLDING POSITION";
         effect(intent.sector, label, suppressed ? 4 : ritual ? 3 : 5);
     } else if (intent.sector == 0) {
-        for (const auto& p : beforeAnimation->getPlayers()) if (p.getPoison() > 0) effect(p.getSector(), "LINGERING ROT", 4);
+        for (const auto& p : beforeAnimation->getPlayers()) if (p.getPoison() > 0) effect(p.getSector(), "LINGERING CORROSION", 4);
     }
 }
 ui::Icon Gui::actorIcon(const std::string& name, bool defender) const {
@@ -304,7 +304,7 @@ ui::Icon Gui::actorIcon(const std::string& name, bool defender) const {
         return ui::patronIcon(static_cast<int>(state.getBoss()->getKind()));
     for (const auto& e : state.getEnemies())
         if (name == e.getName() || name == e.getName() + " #" + std::to_string(e.getId())) return ui::enemyIcon(e.getKind());
-    return ui::Icon::cultist;
+    return ui::Icon::scavenger;
 }
 void Gui::combatAnimation() {
     if (presentation != Presentation::action && presentation != Presentation::enemyResult) return;
@@ -322,7 +322,7 @@ void Gui::combatAnimation() {
     draw.label(at.x - 80, at.y - 39, "COMBAT / " + std::to_string(beat.sector), 12, color);
     draw.circle(ax, y, 13, color); draw.circle(tx, y, 13, beat.defenderAttack ? red : teal);
     draw.icon(ax, y, actorIcon(beat.attacker, beat.defenderAttack), color, 0.85F);
-    draw.icon(tx, y, beat.target == "Warp portal" ? Icon::portal : actorIcon(beat.target, !beat.defenderAttack),
+    draw.icon(tx, y, beat.target == "Breach portal" ? Icon::portal : actorIcon(beat.target, !beat.defenderAttack),
         beat.defenderAttack ? red : teal, 0.85F);
     const float flight = smooth(t / 0.48F);
     const int x = static_cast<int>(ax + (tx - ax) * flight);

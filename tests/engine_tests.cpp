@@ -21,7 +21,7 @@ struct GameTestAccess {
     static void calm(Game& g) { g.deck = {0}; }
     static void nextCard(Game& g, int id) { g.deck = {id}; g.rng.seed(0); }
     static void card(Game& g, int id) { g.activeCard = id; g.record("WORLD EVENT / " + eventCards().at(id).name); g.applyWorldCard(); }
-    static void chaos(Game& g, int value) { g.chaos = value; }
+    static void instability(Game& g, int value) { g.instability = value; }
     static void doom(Game& g, int value) { g.doom = value; }
     static void endRound(Game& g) { g.finishRound(); }
     static void enemyPhase(Game& g) { g.resolveEnemies(); }
@@ -46,7 +46,7 @@ void require(bool condition, const std::string& description) {
     ++assertions;
     if (!condition) throw std::runtime_error(description);
 }
-Game scenario(int count = 1, BossId boss = BossId::khorne, unsigned seed = 42) {
+Game scenario(int count = 1, BossId boss = BossId::emberRegent, unsigned seed = 42) {
     Game g(boss, seed);
     for (int i = 0; i < count; ++i) require(g.addPreset(0, "Defender " + std::to_string(i + 1)), "preset creation");
     g.start(); g.takeLog();
@@ -74,7 +74,7 @@ void trading() {
     const auto initial = snapshot(g);
     for (auto recipient : {0U, 5U}) require(!g.trade(recipient,{false,0}).accepted && snapshot(g)==initial,"invalid recipient is atomic");
     require(!g.trade(1,{true,99}).accepted && snapshot(g)==initial,"invalid item is atomic");
-    require(!g.trade(1,{true,static_cast<int>(WeaponId::heavyBolter)}).accepted && snapshot(g)==initial,"duplicate weapon cannot transfer");
+    require(!g.trade(1,{true,static_cast<int>(WeaponId::rotaryRiveter)}).accepted && snapshot(g)==initial,"duplicate weapon cannot transfer");
     GameTestAccess::players(g)[1].moveTo(2);
     const auto apart = snapshot(g);
     require(!g.trade(1,{false,0}).accepted && snapshot(g)==apart,"trade requires same sector");
@@ -108,10 +108,10 @@ void sectorBonuses() {
     require(weaponProfile(WeaponId::staff,p).hitChance > weaponProfile(WeaponId::staff,Entity(16,armor,3,3,will,2,"Base")).hitChance,"Cathedral Will improves psychic accuracy");
     require(snapshot(restore(snapshot(g)))==snapshot(g),"effective Will does not accumulate in saves");
     p.moveTo(1); require(snapshot(restore(snapshot(g)))==snapshot(g),"effective armor does not accumulate in saves");
-    p.moveTo(3); require(g.playerHitChance(p,WeaponId::marksmanBolter)==80,"Alley adds twenty points to ranged accuracy");
+    p.moveTo(3); require(g.playerHitChance(p,WeaponId::needleRifle)==80,"Alley adds twenty points to ranged accuracy");
     const auto meleeChance=g.playerHitChance(p,WeaponId::sword); p.moveTo(7);
     require(g.playerHitChance(p,WeaponId::sword)==meleeChance,"Alley does not alter melee accuracy");
-    require(g.playerDamage(p,WeaponId::sword)==weapon(WeaponId::sword).damage+2 && g.playerDamage(p,WeaponId::bolter)==weapon(WeaponId::bolter).damage,"Slums bonus affects melee only");
+    require(g.playerDamage(p,WeaponId::sword)==weapon(WeaponId::sword).damage+2 && g.playerDamage(p,WeaponId::rivetRifle)==weapon(WeaponId::rivetRifle).damage,"Slums bonus affects melee only");
     for (int sector : {2,7}) for (unsigned seed=0; seed<20; ++seed) {
         auto fight=scenario(2); auto& fighter=GameTestAccess::players(fight)[0]; fighter.moveTo(sector);
         fighter.giveWeapon(WeaponId::sword); fight.equip(sector==7 ? WeaponId::sword : WeaponId::pistol);
@@ -169,7 +169,7 @@ void bridgeSacrifice() {
     GameTestAccess::boss(g)->takeDamage(damageType::trueDamage,9); const int oldHP=g.getBoss()->getHealth();
     require(g.act({ActionType::collapseBridge},false).accepted,"collapse accepted");
     require(g.isBridgeCollapsed() && g.livingDefenders()==2 && !g.getPlayers()[0].getAlive() && !g.getPlayers()[1].getAlive(),"all bridge defenders die permanently");
-    require(g.getPlayerIndex()==2 && g.getPhase()==TurnPhase::players && g.getChaos()==0,"fallen defenders skipped without ordinary recovery");
+    require(g.getPlayerIndex()==2 && g.getPhase()==TurnPhase::players && g.getInstability()==0,"fallen defenders skipped without ordinary recovery");
     require(g.getBoss()->getSector()==7 && g.getBoss()->getHealth()==oldHP/2,"boss loses rounded-up half current HP and falls into Slums");
     require(g.getKills()==1 && g.getClosed()==1 && g.getEnemies().size()==1 && g.getPortals().size()==1,"bridge enemies and portals destroyed");
     require(g.getRoutes(9).empty() && g.getRoutes(7).empty(),"collapsed bridge traps normal Slums exits");
@@ -185,19 +185,19 @@ void bridgeSacrifice() {
     require(g.act({ActionType::wait},false).accepted && g.act({ActionType::wait},false).accepted && g.getPlayerIndex()==2,"round wraps to first surviving defender");
     require(snapshot(restore(snapshot(g)))==snapshot(g),"mid-phase collapsed campaign reloads");
 
-    // Collapse is local: damage and relocation must never affect a god elsewhere.
+    // Collapse is local: damage and relocation must never affect a sovereign elsewhere.
     for (int patron=0;patron<4;++patron) for (int sector : {7,8,9}) for (int hp : {50,51}) {
         auto local=scenario(2,static_cast<BossId>(patron));
         GameTestAccess::players(local)[0].moveTo(9); GameTestAccess::manifest(local);
         GameTestAccess::boss(local)->moveTo(sector);
         GameTestAccess::boss(local)->takeDamage(damageType::trueDamage,local.getBoss()->getHealth()-hp);
         const auto grenade=local.currentPlayer().getSupply(Consumable::grenade);
-        require(local.act({ActionType::collapseBridge},false).accepted,"bridge collapse for each god and location");
-        require(local.getBoss()->getHealth()==(sector==9 ? hp/2 : hp),"only god on Bridge loses half current HP regardless of resistance");
-        require(local.getBoss()->getSector()==(sector==9 ? 7 : sector),"only god on Bridge is relocated to Slums");
+        require(local.act({ActionType::collapseBridge},false).accepted,"bridge collapse for each sovereign and location");
+        require(local.getBoss()->getHealth()==(sector==9 ? hp/2 : hp),"only sovereign on Bridge loses half current HP regardless of resistance");
+        require(local.getBoss()->getSector()==(sector==9 ? 7 : sector),"only sovereign on Bridge is relocated to Slums");
         require(local.getPlayers()[0].getSupply(Consumable::grenade)==grenade-1 && local.getPlayerIndex()==1,"collapse consumes one grenade and ends actor's turn");
         const auto collapsed=snapshot(local);
-        require(snapshot(restore(collapsed))==collapsed,"all god locations and half-health results persist");
+        require(snapshot(restore(collapsed))==collapsed,"all sovereign locations and half-health results persist");
         require(!local.act({ActionType::collapseBridge},false).accepted && snapshot(local)==collapsed,"Bridge cannot be destroyed twice");
     }
     auto noGrenade=scenario(2); GameTestAccess::players(noGrenade)[0].moveTo(9); GameTestAccess::players(noGrenade)[1].moveTo(9);
@@ -220,7 +220,7 @@ void bridgeSacrifice() {
     GameTestAccess::portals(wave)={{8,6}}; GameTestAccess::enemies(wave).clear();
     for (int round=1;round<=5;++round) GameTestAccess::endRound(wave);
     require(wave.getEnemies().size()==2,"portal wave scales to surviving defenders");
-    auto legacy=scenario(); auto bytes=snapshot(legacy); bytes.replace(0,13,"FORTY_K_RPG 5\n");
+    auto legacy=scenario(); auto bytes=snapshot(legacy); bytes.replace(0,bytes.find('\n')+1,"FORTY_K_RPG 5\n");
     const auto at=bytes.find("SECTORS "); bytes.erase(at,bytes.find('\n',at)-at+1);
     require(snapshot(restore(bytes))==snapshot(legacy),"v5 saves migrate with stable market and intact bridge");
 }
@@ -300,7 +300,7 @@ void creation() {
     require(!g.addPreset(0, "   "), "blank name rejected");
     require(g.addCustom(4, 4, 4, 4, 4, "Jeff"), "original 50-point build works");
     require(g.currentPlayer().getHealth() == 13, "vitality conversion");
-    require(g.currentPlayer().getWeapon() == WeaponId::lasgun, "custom default starting weapon");
+    require(g.currentPlayer().getWeapon() == WeaponId::beamCarbine, "custom default starting weapon");
     for (int i = 0; i < 3; ++i) require(g.addPreset(i, "Preset"), "preset");
     require(!g.addPreset(0, "Fifth"), "four-player maximum");
     g.start(); require(!g.addPreset(0, "Late"), "setup closed after start");
@@ -313,17 +313,17 @@ void creation() {
     require(refused, "empty campaign rejected");
 }
 void setup() {
-    for (auto boss : {BossId::khorne, BossId::tzeentch, BossId::slaanesh, BossId::nurgle}) for (int squad = 1; squad <= 4; ++squad) {
+    for (auto boss : {BossId::emberRegent, BossId::prismOracle, BossId::echoWeaver, BossId::rustGardener}) for (int squad = 1; squad <= 4; ++squad) {
         auto g = scenario(squad, boss);
         require(g.getEnemies().size() == static_cast<std::size_t>(2 * squad), "two starting enemies per defender for every boss and squad size");
         require(std::count_if(g.getEnemies().begin(), g.getEnemies().end(), [](const Enemy& e) { return e.getKind() == 4; }) == squad,
-            "starting wave includes one Warden per defender");
+            "starting wave includes one Anchor per defender");
         for (const auto& enemy : g.getEnemies()) {
-            require(enemy.getKind() == 4 || enemy.getKind() == 7 + 2 * static_cast<int>(boss), "starting mix retains patron daemons and Wardens");
+            require(enemy.getKind() == 4 || enemy.getKind() == 7 + 2 * static_cast<int>(boss), "starting mix retains patron constructs and Anchors");
             require(std::any_of(g.getPortals().begin(), g.getPortals().end(), [&](const Portal& p) { return p.sector == enemy.getSector(); }),
                 "all initial enemies spawn at open portals");
         }
-        require(g.getPortals().size() == (boss == BossId::tzeentch ? 4U : 2U), "boss portal count");
+        require(g.getPortals().size() == (boss == BossId::prismOracle ? 4U : 2U), "boss portal count");
         std::set<int> places;
         for (const auto& p : g.getPortals()) {
             require(p.sector != 1 && p.sector != 6, "safe starting sectors");
@@ -350,19 +350,19 @@ void turnOrderAndInvalidActions() {
 }
 void accuracy() {
     Player weak(10, 0, 1, 5, 2, 1, "Weak");
-    require(weaponProfile(WeaponId::bolter, weak).hitChance == 95, "ordinary ranged weapon rewards surplus Precision without requiring Strength");
+    require(weaponProfile(WeaponId::rivetRifle, weak).hitChance == 95, "ordinary ranged weapon rewards surplus Precision without requiring Strength");
     require(weaponProfile(WeaponId::sword, weak).hitChance == 60, "one unmet Strength requirement costs twenty points");
     require(weaponProfile(WeaponId::staff, weak).hitChance == 60 && weaponProfile(WeaponId::staff, weak).type == damageType::psychic, "unmet Will reduces accuracy rather than changing damage type");
     Player untrained(10, 0, 0, 0, 0, 1, "Untrained");
-    require(weaponProfile(WeaponId::heavyBolter, untrained).hitChance == 40, "two unmet requirements cost forty points regardless of missing stat count");
+    require(weaponProfile(WeaponId::rotaryRiveter, untrained).hitChance == 40, "two unmet requirements cost forty points regardless of missing stat count");
     require(weaponProfile(WeaponId::sword, untrained).hitChance == 60, "melee ignores Precision");
     Player trained(10, 0, 4, 2, 3, 1, "Trained");
-    require(weaponProfile(WeaponId::heavyBolter, trained).hitChance == 80, "exact requirements give eighty percent");
+    require(weaponProfile(WeaponId::rotaryRiveter, trained).hitChance == 80, "exact requirements give eighty percent");
     require(weaponProfile(WeaponId::sword, trained).hitChance == 90, "surplus Strength adds five points each");
     auto g = scenario();
     std::mt19937 expected(123);
     // Reset the test RNG independently of campaign setup.
-    Game rollGame(BossId::khorne, 123);
+    Game rollGame(BossId::emberRegent, 123);
     for (int i = 0; i < 200; ++i) {
         const int die = std::uniform_int_distribution<int>(1, 20)(expected);
         const int bonus = i % 2 == 0 ? 100 : -100;
@@ -376,7 +376,7 @@ void portalsAndLoot() {
     GameTestAccess::enemies(g).clear();
     const int meds = g.currentPlayer().getSupply(Consumable::medkit);
     accepted(g, {ActionType::attackPortal});
-    require(g.getClosed() == 1 && g.getPortals().size() == 1, "unguarded portal automatically hit with heavy bolter");
+    require(g.getClosed() == 1 && g.getPortals().size() == 1, "unguarded portal automatically hit with rotary riveter");
     require(g.getPlayers()[0].getSupply(Consumable::medkit) == meds + 1, "portal reward");
     require(g.getPlayerIndex() == 1, "portal attack uses action");
     auto win = scenario(2);
@@ -403,40 +403,40 @@ void itemsAndSearch() {
     require(searching.getPlayers()[0].getWeapons().size() >= 3, "search grants loot without finite resource counters");
     auto healing = scenario(2);
     GameTestAccess::harm(healing, 0, 10, true);
-    GameTestAccess::chaos(healing, 3);
+    GameTestAccess::instability(healing, 3);
     accepted(healing, {ActionType::medkit});
-    require(healing.getPlayers()[0].getHealth() == 14 && healing.getPlayers()[0].getPoison() == 0, "medkit heals 8 and cures rot");
-    require(healing.getChaos() == 3, "medkit does not reduce chaos");
+    require(healing.getPlayers()[0].getHealth() == 14 && healing.getPlayers()[0].getPoison() == 0, "medkit heals 8 and cures corrosion");
+    require(healing.getInstability() == 3, "medkit does not reduce instability");
     GameTestAccess::players(healing)[1].moveTo(2);
     GameTestAccess::portals(healing) = {{2,6}, {9,6}};
     GameTestAccess::enemies(healing).clear();
-    require(healing.act({ActionType::grenadePortal}, false).accepted && healing.getChaos() == 3, "closing a portal cannot lower chaos");
+    require(healing.act({ActionType::grenadePortal}, false).accepted && healing.getInstability() == 3, "closing a portal cannot lower instability");
     GameTestAccess::card(healing, 5);
-    require(healing.getChaos() == 2, "only a world event lowers chaos");
+    require(healing.getInstability() == 2, "only a world event lowers instability");
 }
 void recoveryAndRetargeting() {
     auto g = scenario(2);
     GameTestAccess::enemies(g).clear();
     GameTestAccess::harm(g, 0, 100);
     require(g.getPlayers()[0].getSector() == 6 && g.getPlayers()[0].getHealth() == 16, "immediate infirmary recovery");
-    require(g.getChaos() == 1 && g.getPlayers()[0].isRecovering(), "recovery adds chaos and immunity");
+    require(g.getInstability() == 1 && g.getPlayers()[0].isRecovering(), "recovery adds instability and immunity");
     require(GameTestAccess::targets(g, 6).empty(), "recovered player not targetable in infirmary");
     const auto eligible = GameTestAccess::targets(g, 1);
     require(eligible.size() == 1 && eligible.front() == 1, "subsequent enemies target remaining player");
     GameTestAccess::spawn(g, 6, 2);
     GameTestAccess::enemyPhase(g);
-    require(g.getPlayers()[0].getHealth() == 16 && g.getChaos() == 1, "infirmary enemy cannot hit recovered player");
+    require(g.getPlayers()[0].getHealth() == 16 && g.getInstability() == 1, "infirmary enemy cannot hit recovered player");
     GameTestAccess::harm(g, 0, 100);
-    require(g.getChaos() == 1, "no repeated knockout in phase");
+    require(g.getInstability() == 1, "no repeated knockout in phase");
     GameTestAccess::endRound(g);
     require(!g.getPlayers()[0].isRecovering(), "immunity expires after phase");
     require(GameTestAccess::targets(g, 6).size() == 1, "player eligible next round");
 }
 void wavesAndDoom() {
     auto g = scenario();
-    GameTestAccess::chaos(g, 2);
+    GameTestAccess::instability(g, 2);
     for (int i = 0; i < 4; ++i) GameTestAccess::endRound(g);
-    require(g.getEnemies().size() == 2 && g.getDoom() == 12, "chaos advances clock but not wave cadence");
+    require(g.getEnemies().size() == 2 && g.getDoom() == 12, "instability advances clock but not wave cadence");
     GameTestAccess::endRound(g);
     require(g.getPortals().size() == 2 && g.getEnemies().size() == 3, "solo wave adds one enemy globally despite two portals");
     require(g.getDoom() == 15 && g.getRound() == 6, "one round advancement");
@@ -482,18 +482,18 @@ void wavesAndDoom() {
     require(empty.getEnemies().size() == existing, "no open portals means no wave spawns");
 }
 void bossRules() {
-    auto s = scenario(1, BossId::slaanesh);
+    auto s = scenario(1, BossId::echoWeaver);
     GameTestAccess::enemies(s).clear(); GameTestAccess::spawn(s, 1, 0); s.takeLog();
     GameTestAccess::enemyPhase(s);
-    require(logCount(s, "targets Defender") == 2, "Slaanesh extra attack");
-    auto n = scenario(2, BossId::nurgle);
+    require(logCount(s, "targets Defender") == 2, "Echo Weaver extra attack");
+    auto n = scenario(2, BossId::rustGardener);
     GameTestAccess::enemies(n).clear();
     GameTestAccess::harm(n, 0, 2, true);
     require(n.getPlayers()[0].getPoison() == 2, "infection");
     GameTestAccess::enemyPhase(n);
-    require(n.getPlayers()[0].getPoison() == 1 && n.getPlayers()[0].getHealth() == 13, "rot ticks once");
+    require(n.getPlayers()[0].getPoison() == 1 && n.getPlayers()[0].getHealth() == 13, "corrosion ticks once");
     GameTestAccess::enemyPhase(n);
-    require(n.getPlayers()[0].getPoison() == 0 && n.getPlayers()[0].getHealth() == 12, "rot expires after two ticks");
+    require(n.getPlayers()[0].getPoison() == 0 && n.getPlayers()[0].getHealth() == 12, "corrosion expires after two ticks");
     auto boss = scenario();
     GameTestAccess::enemies(boss).clear();
     GameTestAccess::doom(boss, boss.getBossDef().deadline - 1);
@@ -516,8 +516,8 @@ void bossRules() {
     require(!slain.getEnemies().empty() && !slain.getPortals().empty(), "boss victory does not require clearing the board");
     require(restore(snapshot(slain)).getOutcome() == Outcome::bossSlain, "boss victory with remaining threats round trips");
     auto ruined = scenario();
-    GameTestAccess::chaos(ruined, 5); GameTestAccess::harm(ruined, 0, 100); GameTestAccess::check(ruined);
-    require(ruined.getOutcome() == Outcome::defeat, "six chaos loses");
+    GameTestAccess::instability(ruined, 5); GameTestAccess::harm(ruined, 0, 100); GameTestAccess::check(ruined);
+    require(ruined.getOutcome() == Outcome::defeat, "six instability loses");
 }
 void worldEvents() {
     auto g = scenario(4);
@@ -543,12 +543,12 @@ void worldEvents() {
 
 }
 void persistence() {
-    auto original = scenario(3, BossId::nurgle, 218);
+    auto original = scenario(3, BossId::rustGardener, 218);
     GameTestAccess::harm(original, 2, 3, true);
     accepted(original, {ActionType::move, 2});
     const auto saved = snapshot(original);
     auto copy = restore(saved);
-    require(snapshot(copy) == saved, "all state round-trips including mid-round player, rot, inventories and RNG");
+    require(snapshot(copy) == saved, "all state round-trips including mid-round player, corrosion, inventories and RNG");
     original.takeLog(); copy.takeLog();
     for (int i = 0; i < 150 && original.getOutcome() == Outcome::ongoing; ++i) {
         accepted(original, {ActionType::wait}); accepted(copy, {ActionType::wait});
@@ -560,9 +560,33 @@ void persistence() {
     rejects(saved + "garbage");
     for (std::size_t size : {std::size_t{0}, std::size_t{20}, saved.size() / 2, saved.size() - 5}) rejects(saved.substr(0, size));
     auto bad = saved;
-    bad.replace(0, std::string("FORTY_K_RPG 1").size(), "FORTY_K_RPG 99"); rejects(bad);
+    bad.replace(0, bad.find('\n'), "VEYRA_SAVE 99"); rejects(bad);
     bad = saved;
     const auto name = bad.find("Defender 1"); bad.replace(name, 10, "\033[2J"); rejects(bad);
+}
+
+void legacyBrandImport() {
+    for (int kind = 0; kind < 4; ++kind) {
+        auto original = scenario(2, static_cast<BossId>(kind), 218);
+        // Import at every phase, including a card already drawn but not resolved.
+        for (int step = 0; step < 12; ++step) {
+            const auto current = snapshot(original);
+            require(current.rfind("VEYRA_SAVE 6\n", 0) == 0, "new saves use the Veyra marker");
+            auto legacy = current;
+            legacy.replace(0, legacy.find('\n'), "FORTY_K_RPG 6");
+            auto imported = restore(legacy);
+            require(snapshot(imported) == current, "old marker imports every field without changing player names or numeric IDs");
+            original.takeLog(); imported.takeLog();
+            if (original.getPhase() == TurnPhase::players) {
+                require(original.act({ActionType::wait}, false).accepted, "original accepts test order");
+                require(imported.act({ActionType::wait}, false).accepted, "import accepts test order");
+            } else {
+                require(original.advancePhase() && imported.advancePhase(), "both advance the saved phase");
+            }
+            require(snapshot(original) == snapshot(imported), "legacy import retains RNG and phase continuation");
+            require(original.takeLog() == imported.takeLog(), "imported actions use current names and identical results");
+        }
+    }
 }
 
 void phasedResolution() {
@@ -605,10 +629,10 @@ void phasedResolution() {
         const auto sector = value.find("SECTORS "); value.erase(sector,value.find('\n',sector)-sector+1);
         const auto at = value.find("WORLD "); value.erase(at, value.find('\n', at) - at + 1); return value;
     };
-    std::string versionThree = withoutWorld(snapshot(legacy)); versionThree.replace(0, 13, "FORTY_K_RPG 3\n");
+    std::string versionThree = withoutWorld(snapshot(legacy)); versionThree.replace(0, versionThree.find('\n')+1, "FORTY_K_RPG 3\n");
     require(snapshot(restore(versionThree)) == snapshot(legacy), "v3 campaign migrates without changing state or RNG");
     std::string versionTwo = withoutWorld(snapshot(legacy));
-    versionTwo.replace(0, 13, "FORTY_K_RPG 2\n");
+    versionTwo.replace(0, versionTwo.find('\n')+1, "FORTY_K_RPG 2\n");
     const auto legacyPlayer = versionTwo.find("\"Defender 1\"");
     versionTwo.insert(versionTwo.find('\n', legacyPlayer), " 4"); // Retired seals are discarded.
     const auto tacticsStart = versionTwo.find("TACTICS "), tacticsEnd = versionTwo.find('\n', tacticsStart);
@@ -620,7 +644,7 @@ void phasedResolution() {
     versionTwo.replace(tacticsStart, tacticsEnd - tacticsStart, migratedTactics.str());
     require(snapshot(restore(versionTwo)) == snapshot(legacy), "v2 seals and wards retire without changing other state or RNG");
     std::string old = withoutWorld(snapshot(legacy));
-    old.replace(0, 13, "FORTY_K_RPG 1\n");
+    old.replace(0, old.find('\n')+1, "FORTY_K_RPG 1\n");
     const auto playerLine = old.find("\"Defender 1\"");
     old.insert(old.find('\n', playerLine), " 0");
     const auto begin = old.find("TACTICS "); const auto end = old.find('\n', begin);
@@ -643,7 +667,7 @@ void expandedEvents() {
     GameTestAccess::card(g, 17);
     for (const auto& p : g.getPlayers()) require(p.getSector() != closed && p.getHealth() == p.getMaxHealth(), "teleport avoids closed sector without damage");
     GameTestAccess::card(g, 18); GameTestAccess::card(g, 19);
-    require(g.playerHitChance(g.currentPlayer(), WeaponId::heavyBolter) == 65 && g.getEnemyAimRounds() == 2, "accuracy effects apply to both sides");
+    require(g.playerHitChance(g.currentPlayer(), WeaponId::rotaryRiveter) == 65 && g.getEnemyAimRounds() == 2, "accuracy effects apply to both sides");
     auto copy = restore(snapshot(g)); require(snapshot(copy) == snapshot(g), "closures and accuracy conditions persist exactly");
     GameTestAccess::endRound(g); require(g.getClosure(closed) == 1 && g.getPlayerAimRounds() == 1, "conditions survive into next defender round");
     GameTestAccess::endRound(g); require(!g.getClosure(closed) && !g.getPlayerAimRounds() && !g.getEnemyAimRounds(), "conditions expire automatically");
@@ -666,7 +690,7 @@ void expandedEvents() {
     GameTestAccess::manifest(destruction); GameTestAccess::boss(destruction)->moveTo(8);
     GameTestAccess::card(destruction, 20); require(destruction.getEnemies().empty() && destruction.hasLivingBoss(), "purge removes regular enemies but spares boss");
     auto replacement = scenario(); GameTestAccess::card(replacement, 2);
-    require(replacement.getEnemies().back().getName() == "Rift Acolyte", "procession replaces obsolete saboteur event");
+    require(replacement.getEnemies().back().getName() == "Breach tuner", "procession replaces obsolete saboteur event");
 }
 void recruitmentAndHitChance() {
     int previous = -1; std::set<int> classes;
@@ -676,7 +700,7 @@ void recruitmentAndHitChance() {
         Game g; require(g.addCustom(4,4,4,4,4,"Custom",c.weapon), "custom can select each preset starting weapon");
         require(g.currentPlayer().getWeapon() == c.weapon && g.currentPlayer().getWeapons().size() == 2, "custom equips selection and retains pistol");
     }
-    Game invalid; require(!invalid.addCustom(4,4,4,4,4,"Custom",WeaponId::bolter), "non-starting weapon rejected atomically");
+    Game invalid; require(!invalid.addCustom(4,4,4,4,4,"Custom",WeaponId::rivetRifle), "non-starting weapon rejected atomically");
     auto g = scenario(); std::mt19937 expected(123); GameTestAccess::seed(g, 123);
     for (int i = 0; i < 200; ++i) require(GameTestAccess::playerHit(g) == (std::uniform_int_distribution<int>(1,100)(expected) <= 85), "surplus Precision applies to actual attack rolls");
     GameTestAccess::card(g, 18); GameTestAccess::seed(g, 456); expected.seed(456);
@@ -687,10 +711,10 @@ void newRules() {
     Player swordsman(16, 2, 5, 2, 3, 1, "Swordsman");
     require(weaponProfile(WeaponId::sword, swordsman).hitChance == 95, "Strength 5 sword user has 95 percent accuracy");
     Player marksman(16, 2, 4, 7, 5, 1, "Marksman");
-    require(weaponProfile(WeaponId::marksmanBolter, marksman).hitChance == 90, "marksman surplus uses its higher Precision requirement");
-    require(weaponProfile(WeaponId::bolter, marksman).hitChance == 100, "accuracy caps at one hundred");
+    require(weaponProfile(WeaponId::needleRifle, marksman).hitChance == 90, "marksman surplus uses its higher Precision requirement");
+    require(weaponProfile(WeaponId::rivetRifle, marksman).hitChance == 100, "accuracy caps at one hundred");
     Player weakMarksman(16, 2, 1, 5, 1, 1, "Weak marksman");
-    require(weaponProfile(WeaponId::heavyBolter, weakMarksman).hitChance == 75, "Precision surplus combines with one unmet Strength penalty");
+    require(weaponProfile(WeaponId::rotaryRiveter, weakMarksman).hitChance == 75, "Precision surplus combines with one unmet Strength penalty");
     auto g = scenario(2);
     GameTestAccess::card(g, 16);
     int closedSector = 0; for (int sector = 1; sector <= 9; ++sector) if (g.getClosure(sector)) closedSector = sector;
@@ -700,7 +724,7 @@ void newRules() {
     require(g.getTransportRounds() == 2 && g.getRoutes(1) == roads, "transport does not alter roads or enemy pathfinding");
     require(!g.canMove(1, 0) && !g.canMove(1, 10) && !g.canMove(1, 1), "transport still validates destinations");
     for (const auto& w : weapons()) GameTestAccess::players(g)[0].giveWeapon(w.id);
-    require(g.equip(WeaponId::marksmanBolter), "new loot weapon equips");
+    require(g.equip(WeaponId::needleRifle), "new loot weapon equips");
     const auto copy = restore(snapshot(g));
     require(snapshot(copy) == snapshot(g) && copy.canMove(1, closedSector), "new weapons and transport survive save and load");
     GameTestAccess::endRound(g);
@@ -711,11 +735,11 @@ void newRules() {
     require(g.getTransportRounds() == 0 && !g.canMove(1, 9), "transport expires after that defender phase");
     for (int id = 0; id < 4; ++id) {
         auto patron = scenario(1, static_cast<BossId>(id));
-        require(patron.getEnemies()[0].getKind() == 7 + 2 * id, "starting daemon belongs to selected god");
+        require(patron.getEnemies()[0].getKind() == 7 + 2 * id, "starting construct belongs to selected sovereign");
         GameTestAccess::card(patron, 7);
         require(patron.getEnemies().back().getKind() == 8 + 2 * id, "hunting event summons patron's hunter");
         GameTestAccess::manifest(patron);
-        require(patron.getBoss()->getMaxHealth() >= 50 && patron.getBossDef().damage >= 7, "all gods have stronger health and attacks");
+        require(patron.getBoss()->getMaxHealth() >= 50 && patron.getBossDef().damage >= 7, "all sovereigns have stronger health and attacks");
         require(snapshot(restore(snapshot(patron))) == snapshot(patron), "new enemies and boss HP round trip");
     }
     auto quiet = scenario(); const auto before = quiet.getPlayers()[0].getSupply(Consumable::medkit);
@@ -724,7 +748,7 @@ void newRules() {
     auto versionFour = [](const Game& state) {
         auto bytes = snapshot(state);
         const auto sector = bytes.find("SECTORS "); bytes.erase(sector,bytes.find('\n',sector)-sector+1);
-        bytes.replace(0, 13, "FORTY_K_RPG 4\n");
+        bytes.replace(0, bytes.find('\n')+1, "FORTY_K_RPG 4\n");
         const auto end = bytes.find('\n', bytes.find("WORLD "));
         const auto transport = bytes.rfind(' ', end);
         bytes.erase(transport, end - transport); return bytes;
@@ -767,9 +791,9 @@ void tacticalRoles() {
     GameTestAccess::players(g)[0].moveTo(2); GameTestAccess::portals(g) = {{2, 6}, {9, 6}};
     GameTestAccess::spawn(g, 2, 4);
     auto before = snapshot(g);
-    require(!g.act({ActionType::attackPortal}, false).accepted, "Warden shields portal from weapon attacks");
+    require(!g.act({ActionType::attackPortal}, false).accepted, "Anchor shields portal from weapon attacks");
     require(snapshot(g) == before, "shield rejection spends no ammo or action");
-    require(g.act({ActionType::grenadePortal}, false).accepted && g.portalShielded(2) && g.getPortals().size() == 1, "grenade destroys portal through Warden shield");
+    require(g.act({ActionType::grenadePortal}, false).accepted && g.portalShielded(2) && g.getPortals().size() == 1, "grenade destroys portal through Anchor shield");
     require(g.getCombatEvents().size() == 1 && g.getCombatEvents()[0].defeated && g.getCombatEvents()[0].style == CombatStyle::grenade, "portal combat event records explosion and destruction");
 
     auto guard = scenario(2); accepted(guard, {ActionType::guard});
@@ -779,8 +803,8 @@ void tacticalRoles() {
 
     auto suppression = scenario(2); GameTestAccess::enemies(suppression).clear();
     GameTestAccess::spawn(suppression, 1, 5); GameTestAccess::seed(suppression, 0);
-    const int hound = suppression.getEnemies()[0].getId();
-    require(suppression.act({ActionType::suppress, hound}, false).accepted, "suppress action");
+    const int wireStalker = suppression.getEnemies()[0].getId();
+    require(suppression.act({ActionType::suppress, wireStalker}, false).accepted, "suppress action");
     require(suppression.getEnemies()[0].isSuppressed() && suppression.getEnemies()[0].getHealth() == 4, "suppression hits but deals no damage");
     auto copy = restore(snapshot(suppression));
     require(copy.getEnemies()[0].isSuppressed(), "suppression saves");
@@ -793,14 +817,14 @@ void tacticalRoles() {
     GameTestAccess::enemies(hunter)[0].moveTo(7); GameTestAccess::reverse(hunter, 2); GameTestAccess::enemyPhase(hunter);
     require(hunter.getEnemies()[0].getSector() == 5, "Hound follows reversed roads");
 
-    auto acolyte = scenario(); GameTestAccess::enemies(acolyte).clear(); GameTestAccess::spawn(acolyte, 8, 3);
-    GameTestAccess::enemyPhase(acolyte); require(acolyte.getEnemies()[0].getSector() == 8, "Acolyte holds position without a local defender");
-    GameTestAccess::players(acolyte)[0].moveTo(8); GameTestAccess::enemyPhase(acolyte);
-    require(!acolyte.getCombatEvents().empty() && acolyte.getCombatEvents()[0].style == CombatStyle::psychic, "Acolyte attacks with psychic damage");
+    auto breachTuner = scenario(); GameTestAccess::enemies(breachTuner).clear(); GameTestAccess::spawn(breachTuner, 8, 3);
+    GameTestAccess::enemyPhase(breachTuner); require(breachTuner.getEnemies()[0].getSector() == 8, "Breach tuner holds position without a local defender");
+    GameTestAccess::players(breachTuner)[0].moveTo(8); GameTestAccess::enemyPhase(breachTuner);
+    require(!breachTuner.getCombatEvents().empty() && breachTuner.getCombatEvents()[0].style == CombatStyle::psychic, "Breach tuner attacks with psychic damage");
 
-    auto drone = scenario(); GameTestAccess::enemies(drone).clear(); GameTestAccess::players(drone)[0].moveTo(6); GameTestAccess::spawn(drone, 6, 6); GameTestAccess::seed(drone, 0);
-    GameTestAccess::enemyPhase(drone);
-    require(drone.currentPlayer().getPoison() == 2, "Drone infects independently of boss selection");
+    auto rustDrone = scenario(); GameTestAccess::enemies(rustDrone).clear(); GameTestAccess::players(rustDrone)[0].moveTo(6); GameTestAccess::spawn(rustDrone, 6, 6); GameTestAccess::seed(rustDrone, 0);
+    GameTestAccess::enemyPhase(rustDrone);
+    require(rustDrone.currentPlayer().getPoison() == 2, "Drone infects independently of boss selection");
 
 
 }
@@ -812,12 +836,12 @@ void combatPresentation() {
         g.equip(WeaponId::pistol); GameTestAccess::seed(g, seed);
         require(g.act({ActionType::attackEnemy, g.getEnemies()[0].getId()}, false).accepted, "animated attack accepted");
         const auto& beat = g.getCombatEvents().at(0);
-        require(beat.attacker == "Defender 1" && beat.target == "Chaos Space Marine" && beat.sector == 1 && beat.defenderAttack, "combat event identifies both actors and sector");
+        require(beat.attacker == "Defender 1" && beat.target == "Siege automaton" && beat.sector == 1 && beat.defenderAttack, "combat event identifies both actors and sector");
         require(beat.style == CombatStyle::ranged && beat.damage == 0 && !beat.defeated, "armor-blocked shot records zero damage");
         hits += beat.hit; misses += !beat.hit;
     }
     require(hits > 0 && misses > 0, "animation distinguishes misses from blocked hits");
-    auto enemies = scenario(2, BossId::slaanesh); GameTestAccess::enemies(enemies).clear(); GameTestAccess::spawn(enemies, 1, 0);
+    auto enemies = scenario(2, BossId::echoWeaver); GameTestAccess::enemies(enemies).clear(); GameTestAccess::spawn(enemies, 1, 0);
     GameTestAccess::enemyPhase(enemies);
     require(enemies.getCombatEvents().size() == 2, "double enemy strike produces separate animation beats");
     for (const auto& beat : enemies.getCombatEvents()) require(!beat.defenderAttack && beat.sector == 1 && beat.target.find("Defender") == 0, "enemy animation identifies actual selected defender");
@@ -838,7 +862,7 @@ void lastStand() {
     int summons = 0;
     for (unsigned seed = 0; seed < 300; ++seed) {
         auto trial = scenario(); GameTestAccess::portals(trial).clear(); GameTestAccess::enemies(trial).clear();
-        GameTestAccess::spawn(trial, 8, 3); // Acolyte must not attack during a ritual.
+        GameTestAccess::spawn(trial, 8, 3); // Breach tuner must not attack during a ritual.
         GameTestAccess::players(trial)[0].moveTo(8);
         GameTestAccess::seed(trial, seed);
         std::mt19937 expected(seed);
@@ -852,7 +876,7 @@ void lastStand() {
 
     auto resumed = scenario(); GameTestAccess::portals(resumed).clear(); GameTestAccess::enemies(resumed).clear();
     GameTestAccess::players(resumed)[0].moveTo(8); GameTestAccess::spawn(resumed, 2, 5); GameTestAccess::spawn(resumed, 8, 3); GameTestAccess::calm(resumed);
-    resumed.act({ActionType::wait}, false); resumed.advancePhase(); resumed.advancePhase(); resumed.advancePhase(); // draw, resolve, rot
+    resumed.act({ActionType::wait}, false); resumed.advancePhase(); resumed.advancePhase(); resumed.advancePhase(); // draw, resolve, corrosion
     unsigned successSeed = 0;
     for (;; ++successSeed) { std::mt19937 rng(successSeed); if (std::uniform_int_distribution<int>(1,10)(rng) == 1) break; }
     GameTestAccess::seed(resumed, successSeed);
@@ -860,7 +884,7 @@ void lastStand() {
     resumed.advancePhase(); copy.advancePhase();
     require(!resumed.isLastStand() && snapshot(resumed) == snapshot(copy), "save before ritual preserves exact success and RNG");
     require(resumed.enemyIntent().description.find("Attacks") != std::string::npos, "later enemies immediately resume normal behavior after summon");
-    resumed.advancePhase(); require(!resumed.getCombatEvents().empty(), "resumed Acolyte attacks instead of rolling another summon");
+    resumed.advancePhase(); require(!resumed.getCombatEvents().empty(), "resumed Breach tuner attacks instead of rolling another summon");
 
     auto suppression = scenario(2); GameTestAccess::enemies(suppression).clear(); GameTestAccess::portals(suppression).clear();
     GameTestAccess::spawn(suppression, 1, 0); GameTestAccess::seed(suppression, 0);
@@ -870,10 +894,10 @@ void lastStand() {
     GameTestAccess::card(suppression, 3);
     require(!suppression.isLastStand() && suppression.getPortals().size() == 1, "world portal event also ends last stand");
 
-    auto doubleStrike = scenario(1, BossId::slaanesh); GameTestAccess::enemies(doubleStrike).clear(); GameTestAccess::portals(doubleStrike).clear();
+    auto doubleStrike = scenario(1, BossId::echoWeaver); GameTestAccess::enemies(doubleStrike).clear(); GameTestAccess::portals(doubleStrike).clear();
     GameTestAccess::spawn(doubleStrike, 2, 0); GameTestAccess::seed(doubleStrike, 0);
     GameTestAccess::enemyPhase(doubleStrike);
-    require(logCount(doubleStrike, "attempts a last-stand ritual") == 1, "Slaanesh grants no extra ritual rolls");
+    require(logCount(doubleStrike, "attempts a last-stand ritual") == 1, "Echo Weaver grants no extra ritual rolls");
 
     auto safe = scenario(); GameTestAccess::portals(safe).clear(); GameTestAccess::enemies(safe).clear(); GameTestAccess::spawn(safe, 1, 0);
     GameTestAccess::seed(safe, successSeed); GameTestAccess::enemyPhase(safe);
@@ -950,7 +974,7 @@ void simulations() {
                 accepted(g, patrolOrder(g));
                 for (const auto& p : g.getPlayers()) require(p.getAlive() && p.getHealth() <= p.getMaxHealth(), "sim player HP invariant");
                 for (const auto& e : g.getEnemies()) require(e.getAlive(), "sim no dead enemies retained");
-                require(g.getChaos() >= 0 && g.getChaos() <= 6, "sim chaos invariant");
+                require(g.getInstability() >= 0 && g.getInstability() <= 6, "sim instability invariant");
                 if (actions % 11 == 0) require(snapshot(restore(snapshot(g))) == snapshot(g), "sim save roundtrip");
                 g.takeLog(); ++actions;
             }
@@ -976,6 +1000,7 @@ int main() {
         {"items and scavenging", itemsAndSearch}, {"recovery and retargeting", recoveryAndRetargeting},
         {"portal waves and doom", wavesAndDoom}, {"boss rules and endings", bossRules},
         {"world event deck", worldEvents}, {"save validation and deterministic continuation", persistence},
+        {"legacy branding import", legacyBrandImport},
         {"phased resolution and migration", phasedResolution}, {"world changes without direct damage", worldWithoutDamage}, {"expanded event effects", expandedEvents}, {"recruitment and percentage accuracy", recruitmentAndHitChance},
         {"new weapons, transport and patron enemies", newRules}, {"tactical enemy roles and counters", tacticalRoles}, {"enemy last stand and complete victory", lastStand}, {"combat presentation events", combatPresentation}, {"seeded campaign simulations", simulations}
     };

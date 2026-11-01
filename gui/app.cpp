@@ -18,9 +18,9 @@ const std::array<SDL_Point, 9> positions {{{164, 252}, {466, 252}, {800, 252}, {
 const std::array<const char*, 9> descriptions {{
     "+2 armor for defenders.", "+5 true damage on defender attacks.",
     "+20% ranged accuracy for defenders.", "Move along outgoing roads for free.",
-    "+4 Will for defenders.", "Rest fully heals and cures rot.",
+    "+4 Will for defenders.", "Rest fully heals and cures corrosion.",
     "+2 physical damage on all melee attacks.", "Take one of three offers. Costs an action; refreshes each defender turn.",
-    "Use Collapse Bridge with a krak grenade. Defenders here die permanently. If the god is here, it loses half its current HP and moves to Slums."
+    "Use Collapse Bridge with a breach grenade. Defenders here die permanently. If the sovereign is here, it loses half its current HP and moves to Slums."
 }};
 
 }
@@ -108,7 +108,7 @@ void Gui::perform(Action action) {
     actingPlayer = static_cast<int>(game->getPlayerIndex());
     const auto result = game->act(action, false);
     if (!result.accepted) { beforeAnimation.reset(); toast(result.error + " No action spent.", true); return; }
-    const std::array<const char*, 15> labels {{"MOVEMENT", "WEAPON ATTACK", "ATTACK THE RIFT", "ATTACK THE AVATAR", "SCAVENGE", "REST", "MEDKIT", "KRAK GRENADE", "KRAK GRENADE", "KRAK GRENADE", "HOLD POSITION", "TAKE COVER", "SUPPRESSING FIRE", "MARKET SUPPLIES", "BRIDGE COLLAPSE"}};
+    const std::array<const char*, 15> labels {{"MOVEMENT", "WEAPON ATTACK", "ATTACK THE RIFT", "ATTACK THE AVATAR", "SCAVENGE", "REST", "MEDKIT", "BREACH GRENADE", "BREACH GRENADE", "BREACH GRENADE", "HOLD POSITION", "TAKE COVER", "SUPPRESSING FIRE", "MARKET SUPPLIES", "BRIDGE COLLAPSE"}};
     actionLabel = labels.at(static_cast<std::size_t>(action.type));
     animatedAction = action.type;
     notice.clear(); gatherLog(); beginStage(Presentation::action);
@@ -122,7 +122,7 @@ void Gui::cycleRecruit(int index, int direction) {
     clearFocus();
 }
 void Gui::startQuick() {
-    Game candidate(BossId::khorne, fixedSeed ? initialSeed : std::random_device{}());
+    Game candidate(BossId::emberRegent, fixedSeed ? initialSeed : std::random_device{}());
     const auto recruit = quickDefender(candidate.getSeed(), lastQuickPreset); lastQuickPreset = recruit.preset;
     candidate.addPreset(recruit.preset, recruit.name);
     for (int i=1; i<quickPlayerCount; ++i) {
@@ -193,32 +193,16 @@ void Gui::titleScreen() {
             draw.line(cx+static_cast<int>(inner*std::cos(a)),cy+static_cast<int>(inner*std::sin(a)),
                       cx+static_cast<int>(212*std::cos(a)),cy+static_cast<int>(212*std::sin(a)),i%6==0 ? gold : Color{89,84,66});
         }
-        for (int side : {-1,1}) {
-            for (int feather=0;feather<9;++feather) {
-                const int outer=cx+side*(173-feather*10), top=cy-62+feather*12;
-                const int inner=cx+side*(55+feather*2), bottom=cy+26+feather*7;
-                draw.line(inner+3,bottom+4,outer+3,top+4,{5,12,15});
-                draw.line(inner,bottom,outer,top,{185,145,84});
-                draw.line(inner,bottom+3,outer,top+4,{90,77,51});
-                draw.line(outer,top,outer-side*7,top+22,{223,185,117});
-            }
-            // Laurel leaves along the lower rim.
-            for (int leaf=0;leaf<8;++leaf) {
-                const double a=0.20+leaf*0.115;
-                const int x=cx+side*static_cast<int>(163*std::cos(a)), y=cy+static_cast<int>(163*std::sin(a));
-                draw.line(x,y,x-side*14,y-15,{153,130,83});
-                draw.line(x,y,x+side*4,y-22,{153,130,83});
-                draw.line(x-side*14,y-15,x+side*4,y-22,{80,78,57});
-            }
+        // A broken relay circuit surrounds the city's beacon, not faction heraldry.
+        for (int side : {-1,1}) for (int channel=0;channel<5;++channel) {
+            const int y=cy-110+channel*53, inner=cx+side*112, outer=cx+side*172;
+            draw.line(inner,y,outer,y,{153,165,155});
+            draw.line(outer,y,outer,y+22,{97,191,171});
+            draw.circle(outer,y+25,3,teal,true);
         }
-        // A gilded blade behind the defender's helmet, with a raised central shield.
-        draw.line(cx,cy-169,cx-14,cy-139,gold); draw.line(cx,cy-169,cx+14,cy-139,gold);
-        draw.line(cx-14,cy-139,cx-11,cy+120,gold); draw.line(cx+14,cy-139,cx+11,cy+120,gold);
-        draw.line(cx,cy-154,cx,cy+130,{242,208,147});
-        draw.line(cx-39,cy+106,cx+39,cy+106,gold); draw.circle(cx,cy+142,8,gold);
-        draw.circle(cx,cy-9,87,{12,22,27},true); draw.circle(cx,cy-9,88,{127,109,76});
-        draw.icon(cx+2,cy-6,Icon::marine,{5,10,13},4.4F);
-        draw.icon(cx,cy-9,Icon::marine,{221,196,147},4.4F);
+        draw.circle(cx,cy-9,87,{12,22,27},true);
+        draw.circle(cx,cy-9,88,{127,109,76});
+        draw.icon(cx,cy-9,Icon::insignia,{221,196,147},4.4F);
         draw.circle(cx,cy-9,94,{62,67,59});
         for (int x : {cx-222,cx+222}) { draw.circle(x,cy,6,gold,true); draw.circle(x,cy,3,{49,46,35},true); }
         draw.icon(cx,cy-222,Icon::insignia,gold,0.65F);
@@ -227,13 +211,14 @@ void Gui::titleScreen() {
             const int x=895+i*100;
             draw.line(x-32,788,x,756,{70,75,66}); draw.line(x,756,x+32,788,{70,75,66});
             draw.line(x+32,788,x,820,{70,75,66}); draw.line(x,820,x-32,788,{70,75,66});
-            draw.icon(x,788,static_cast<Icon>(static_cast<int>(Icon::marine)+i),{174,157,118},1.15F);
+            draw.icon(x,788,static_cast<Icon>(static_cast<int>(Icon::bulwark)+i),{174,157,118},1.15F);
         }
         SDL_SetRenderTarget(renderer,original); SDL_RenderSetLogicalSize(renderer,Width,Height);
     }
     SDL_RenderCopy(renderer,menuArtwork.get(),nullptr,nullptr);
     // Fine framing and a clean control column keep the menu readable.
     draw.line(76,134,516,134,{86,77,55}); draw.icon(93,134,Icon::insignia,gold,0.8F);
+    draw.label(76,156,"VEYRA",15,teal);
     draw.label(74,188,"THE LAST",58,text); draw.label(70,252,"WATCH",100,gold);
     draw.line(76,382,516,382,{86,77,55});
     button("new",{76,419,440,52},"New campaign",[this] { screen=Screen::setup; notice.clear(); },true,true);
@@ -279,7 +264,7 @@ void Gui::setupScreen() {
         button("class-" + num(i), {150, y + 10, 208, 44}, r.preset == 4 ? "Custom defender" : characters()[r.preset].name,
             [this, i] { cycleRecruit(i, 1); }, true, false, "Choose a defender. Use either arrow to cycle.");
         button("class-next-" + num(i), {364, y + 10, 38, 44}, ">", [this, i] { cycleRecruit(i, 1); });
-        draw.icon(416, y + 32, static_cast<Icon>(static_cast<int>(Icon::marine) + r.preset), teal, 0.6F);
+        draw.icon(416, y + 32, static_cast<Icon>(static_cast<int>(Icon::bulwark) + r.preset), teal, 0.6F);
         field("name-" + num(i), {430, y + 10, 330, 44}, r.name, 32, "Enter a callsign");
         if (r.preset == 4) {
             const auto& s = r.stats;
@@ -373,7 +358,7 @@ void Gui::board() {
         }
         if (boss) {
             draw.icon(box.x + 159, box.y + 96, patronIcon(static_cast<int>(game->getBoss()->getKind())), red, 0.7F);
-            draw.label(box.x + 174, box.y + 92, "GOD", 10, red);
+            draw.label(box.x + 174, box.y + 92, "BOSS", 10, red);
         } else if (game->getClosure(s.id)) {
             for (int i = 0; i < 5; ++i) draw.line(box.x + 158+i*8,box.y+102,box.x+163+i*8,box.y+90,red);
         }
@@ -386,7 +371,7 @@ void Gui::board() {
     if (game->getTransportRounds()) conditions += (conditions.empty() ? "" : "  |  ") + std::string("TRANSPORT / Fly to any sector");
     if (conditions.empty()) {
         draw.icon(50, 665, Icon::defender, teal, 0.55F); draw.label(66, 658, "Defender", 12, muted);
-        draw.icon(174, 665, Icon::cultist, red, 0.55F); draw.label(190, 658, "Enemy", 12, muted);
+        draw.icon(174, 665, Icon::scavenger, red, 0.55F); draw.label(190, 658, "Enemy", 12, muted);
         draw.icon(282, 665, Icon::portal, purple, 0.55F); draw.label(298, 658, "Portal / HP", 12, muted);
         draw.icon(421, 665, patronIcon(static_cast<int>(game->getBossDef().id)), red, 0.55F); draw.label(437, 658, "Avatar", 12, muted);
         draw.label(535, 658, "GOLD / Selected routes", 12, gold);
@@ -403,14 +388,14 @@ void Gui::battleScreen() {
     button("archive", {1058, 25, 104, 40}, "Archive", [this] { archivePath = savePath; openModal(Modal::archive); });
     button("codex", {1174, 25, 108, 40}, "Manual", [this] { openModal(Modal::help); });
     button("menu", {1294, 25, 122, 40}, "Menu", [this] { openModal(Modal::pause); });
-    const std::array<std::string, 5> labels {{"ROUND " + num(g.getRound()), "DOOM CLOCK", "CHAOS", "OPEN RIFTS", g.isLastStand() ? "ENEMY LAST STAND" : g.hasLivingBoss() ? "AVATAR DEADLINE" : "NEXT PORTAL WAVE"}};
-    const std::array<std::string, 5> values {{"P" + num(static_cast<int>(g.getPlayerIndex() + 1)) + " / " + p.getName(), num(g.getDoom()) + " / " + num(g.getBossDef().deadline), num(g.getChaos()) + " / 6", num(static_cast<int>(g.getPortals().size())) + " remaining", g.isLastStand() ? "10% / enemy activation" : g.hasLivingBoss() ? num(g.getFinalRounds()) + " rounds left" : num(g.livingDefenders()) + " total / round " + num(((g.getRound() - 1) / 5 + 1) * 5)}};
+    const std::array<std::string, 5> labels {{"ROUND " + num(g.getRound()), "DOOM CLOCK", "INSTABILITY", "OPEN RIFTS", g.isLastStand() ? "ENEMY LAST STAND" : g.hasLivingBoss() ? "AVATAR DEADLINE" : "NEXT PORTAL WAVE"}};
+    const std::array<std::string, 5> values {{"P" + num(static_cast<int>(g.getPlayerIndex() + 1)) + " / " + p.getName(), num(g.getDoom()) + " / " + num(g.getBossDef().deadline), num(g.getInstability()) + " / 6", num(static_cast<int>(g.getPortals().size())) + " remaining", g.isLastStand() ? "10% / enemy activation" : g.hasLivingBoss() ? num(g.getFinalRounds()) + " rounds left" : num(g.livingDefenders()) + " total / round " + num(((g.getRound() - 1) / 5 + 1) * 5)}};
     for (int i = 0; i < 5; ++i) {
         SDL_Rect box {24 + i * 282, 89, 264, 64};
         draw.fill(box, (g.hasLivingBoss() || g.isLastStand()) ? Color{38, 23, 32} : panel); draw.label(box.x + 14, box.y + 9, labels[i], 11, muted);
-        draw.label(box.x + 14, box.y + 29, draw.elide(values[i], box.w - 28, 19), 19, i == 2 && g.getChaos() > 2 ? red : i == 0 ? teal : gold);
+        draw.label(box.x + 14, box.y + 29, draw.elide(values[i], box.w - 28, 19), 19, i == 2 && g.getInstability() > 2 ? red : i == 0 ? teal : gold);
         if (i == 1) draw.bar({box.x, box.y + 61, box.w, 3}, g.getDoom(), g.getBossDef().deadline, gold);
-        if (i == 2) draw.bar({box.x, box.y + 61, box.w, 3}, g.getChaos(), 6, red);
+        if (i == 2) draw.bar({box.x, box.y + 61, box.w, 3}, g.getInstability(), 6, red);
     }
     phaseRail();
     board(); sectorPanel(); defenderPanel(); logPanel();
@@ -436,7 +421,7 @@ void Gui::sectorPanel() {
     const bool portalGuarded = (g.hasLivingBoss() && g.getBoss()->getSector() == selectedSector) ||
         std::any_of(g.getEnemies().begin(), g.getEnemies().end(), [this](const Enemy& e) { return e.getSector() == selectedSector; });
     for (const auto& r : g.getPortals()) if (r.sector == selectedSector)
-        contacts.push_back({-1, r.health, 6, "Warp portal", g.portalShielded(selectedSector) ? "SHIELDED / Grenades bypass" : portalGuarded ? "GUARDED / Roll weapon hit chance" : "UNGUARDED / Automatic weapon hit", purple, Icon::portal});
+        contacts.push_back({-1, r.health, 6, "Breach portal", g.portalShielded(selectedSector) ? "SHIELDED / Grenades bypass" : portalGuarded ? "GUARDED / Roll weapon hit chance" : "UNGUARDED / Automatic weapon hit", purple, Icon::portal});
     if (g.hasLivingBoss() && g.getBoss()->getSector() == selectedSector) {
         const auto& b = *g.getBoss();
         contacts.push_back({-2, b.getHealth(), b.getMaxHealth(), b.getName() + " / avatar", "ARM " + num(b.getArmor()) + "   WILL " + num(b.getWill()), purple, patronIcon(static_cast<int>(b.getKind()))});
@@ -460,14 +445,14 @@ void Gui::sectorPanel() {
         draw.label(box.x + 48, box.y + 28, draw.elide(c.stats, 239, 11), 11, muted);
         draw.label(box.x + 296, box.y + 8, num(c.hp) + " HP", 14, text);
         draw.bar({box.x + 296, box.y + 35, 64, 3}, c.hp, c.maxHP, c.color);
-        buttons.push_back({"target-" + num(c.id), box, live, [this, id = c.id] { selectedTarget = id; }, "Select target; then choose Attack or Krak grenade."});
+        buttons.push_back({"target-" + num(c.id), box, live, [this, id = c.id] { selectedTarget = id; }, "Select target; then choose Attack or Breach grenade."});
     }
     button("targets-prev", {1024, 562, 40, 27}, "<", [this] { --targetPage; }, targetPage > 0);
     draw.label(1082, 566, num(static_cast<int>(contacts.size())) + " contacts  /  " + num(targetPage + 1) + " of " + num(pages), 12, muted);
     button("targets-next", {1356, 562, 40, 27}, ">", [this] { ++targetPage; }, targetPage < pages - 1);
     std::string tactic;
     for (const auto& e : g.getEnemies()) if (e.getId() == selectedTarget) tactic = e.isSuppressed() ? "SUPPRESSED / Will skip its next enemy-phase action. " + e.definition().tactic : e.definition().tactic;
-    if (selectedTarget == -1) tactic = g.portalShielded(selectedSector) ? "SHIELDED / Weapons cannot damage this portal until its Warden falls. A krak grenade bypasses the shield and collapses it." : "Unguarded: automatic hit. With other guards, roll your weapon hit chance. Grenades always close an unshielded rift.";
+    if (selectedTarget == -1) tactic = g.portalShielded(selectedSector) ? "SHIELDED / Weapons cannot damage this portal until its Anchor falls. A breach grenade bypasses the shield and collapses it." : "Unguarded: automatic hit. With other guards, roll your weapon hit chance. Grenades always close an unshielded rift.";
     if (selectedTarget == -2) tactic = "The avatar attacks local defenders or moves toward the nearest one. Grenades bypass its resistance.";
     if (g.isLastStand() && selectedTarget != 0) tactic = "LAST STAND / Holds position to summon a portal (10% per activation). Suppression cancels an activation; a new rift restores normal behavior.";
     draw.paragraph(1024, 598, tactic, 372, 13, selectedTarget == -1 && g.portalShielded(selectedSector) ? purple : muted, 3);
@@ -475,15 +460,15 @@ void Gui::sectorPanel() {
     button("attack", {1024, 664, 180, 43}, "Attack (" + num(selectedTarget == -1 && !portalGuarded ? 100 : g.playerHitChance(p, p.getWeapon())) + "%)", [this] {
         perform({selectedTarget == -1 ? ActionType::attackPortal : selectedTarget == -2 ? ActionType::attackBoss : ActionType::attackEnemy, selectedTarget});
     }, canAttack, true, "One action. Your equipped weapon determines damage and accuracy.");
-    button("grenade", {1216, 664, 180, 43}, "Krak grenade (" + num(p.getSupply(Consumable::grenade)) + ")", [this] {
+    button("grenade", {1216, 664, 180, 43}, "Breach grenade (" + num(p.getSupply(Consumable::grenade)) + ")", [this] {
         perform({selectedTarget == -1 ? ActionType::grenadePortal : selectedTarget == -2 ? ActionType::grenadeBoss : ActionType::grenadeEnemy, selectedTarget});
     }, here && live && selectedTarget != 0 && p.getSupply(Consumable::grenade) > 0, false, "Always hits. Destroy a portal; deal " + num(5+g.playerTrueBonus(p)) + " true damage to enemies or bosses.");
     draw.line(1024, 726, 1396, 726, border);
     draw.label(1024, 739, draw.elide(p.getName(), 372, 11), 11, muted);
     button("search", {1024, 764, 116, 38}, "Search", [this] { perform({ActionType::search}); }, live, false, "Search your current sector, regardless of which sector you are inspecting.");
-    button("rest", {1152, 764, 116, 38}, "Rest", [this] { perform({ActionType::rest}); }, live && (p.getHealth() < p.getMaxHealth() || p.getPoison() > 0), false, "Heal 5 HP. At Infirmary: fully heal and cure rot.");
+    button("rest", {1152, 764, 116, 38}, "Rest", [this] { perform({ActionType::rest}); }, live && (p.getHealth() < p.getMaxHealth() || p.getPoison() > 0), false, "Heal 5 HP. At Infirmary: fully heal and cure corrosion.");
     button("wait", {1280, 764, 116, 38}, "Wait", [this] { perform({ActionType::wait}); }, live, false, "Spend this defender's action without moving.");
-    button("medkit", {1024, 814, 116, 38}, "Medkit (" + num(p.getSupply(Consumable::medkit)) + ")", [this] { perform({ActionType::medkit}); }, live && p.getSupply(Consumable::medkit) > 0 && (p.getHealth() < p.getMaxHealth() || p.getPoison() > 0), false, "Heal 8 HP and cure rot. Costs one action.");
+    button("medkit", {1024, 814, 116, 38}, "Medkit (" + num(p.getSupply(Consumable::medkit)) + ")", [this] { perform({ActionType::medkit}); }, live && p.getSupply(Consumable::medkit) > 0 && (p.getHealth() < p.getMaxHealth() || p.getPoison() > 0), false, "Heal 8 HP and cure corrosion. Costs one action.");
     button("guard", {1152, 814, 116, 38}, "Guard", [this] { perform({ActionType::guard}); }, live, false, "Take cover: reduce all enemy-hit damage by 3 this round. Costs one action.");
     button("suppress", {1280, 814, 116, 38}, "Suppress", [this] { perform({ActionType::suppress, selectedTarget}); }, live && here && selectedTarget > 0 && weapon(p.getWeapon()).accuracy == Accuracy::precision, false, "Ranged hit: stop this enemy's next action instead of dealing damage.");
     if (p.getSector() == 8) button("market", {1024,867,372,32}, "Market offers", [this] { openModal(Modal::market); }, live);
@@ -502,7 +487,7 @@ void Gui::defenderPanel() {
     draw.bar({42, 772, 216, 6}, p.getHealth(), p.getMaxHealth(), teal);
     draw.label(270, 763, num(p.getHealth()) + " / " + num(p.getMaxHealth()), 14, text);
     draw.label(42, 793, "ARM " + num(p.getArmor()) + "   STR " + num(p.getStrength()) + "   PRE " + num(p.getPrecision()) + "   WILL " + num(p.getWill()), 13, muted);
-    draw.label(42, 821, weapon(p.getWeapon()).name + (p.isGuarding() ? " / GUARD" : "") + (p.getPoison() ? "  / ROT " + num(p.getPoison()) : ""), 16, p.getPoison() ? red : gold);
+    draw.label(42, 821, weapon(p.getWeapon()).name + (p.isGuarding() ? " / GUARD" : "") + (p.getPoison() ? "  / CORROSION " + num(p.getPoison()) : ""), 16, p.getPoison() ? red : gold);
     button("equipment", {42, 855, 155, 37}, "Equipment", [this] { openModal(Modal::inventory); }, true, false, "Inspect squad and equip weapons for free.");
     draw.label(214, 864, num(game->livingDefenders()) + " alive", 13, muted);
 }
@@ -512,7 +497,7 @@ void Gui::logPanel() {
     if (lastStand) {
         draw.fill({380, 698, 604, 214}, {39, 21, 31}); draw.outline({380, 698, 604, 214}, red);
         draw.label(398, 713, "ENEMY LAST STAND", 13, red);
-        draw.paragraph(398, 746, "Until the god arrives, enemies hold position: each has a 10% summon chance per hostile activation. A new rift restores normal behavior. Eliminate all enemies and portals to win.", 562, 15, text, 4);
+        draw.paragraph(398, 746, "Until the sovereign arrives, enemies hold position: each has a 10% summon chance per hostile activation. A new rift restores normal behavior. Eliminate all enemies and portals to win.", 562, 15, text, 4);
     } else draw.label(398, 713, "BATTLE LOG", 11, muted);
     button("journal", {846, 706, 120, 30}, "Full journal", [this] { openModal(Modal::journal); });
     std::vector<std::string> lines;
@@ -545,33 +530,33 @@ void Gui::helpModal() {
     struct Section { const char* title; const char* body; };
     struct Page { const char* title; std::array<Section,3> sections; };
     static const std::array<Page,10> pages {{
-        {"Objectives", {{{"WIN", "Close every portal AND defeat every enemy. Killing the Chaos god also wins immediately, even if other enemies or portals remain."},
-            {"LOSE", "Chaos reaches 6, all defenders die permanently, or the god survives eight rounds after it appears. Killing the god takes priority over losing the squad."},
-            {"BEFORE THE GOD ARRIVES", "With no portals left, surviving enemies stop and try to summon: 10% per enemy activation. A new portal or the god's arrival ends this last stand. It never returns after the god appears."}}}},
+        {"Objectives", {{{"WIN", "Close every portal AND defeat every enemy. Killing the Sovereign also wins immediately, even if other enemies or portals remain."},
+            {"LOSE", "Instability reaches 6, all defenders die permanently, or the sovereign survives eight rounds after it appears. Killing the sovereign takes priority over losing the squad."},
+            {"BEFORE THE SOVEREIGN ARRIVES", "With no portals left, surviving enemies stop and try to summon: 10% per enemy activation. A new portal or the sovereign's arrival ends this last stand. It never returns after the sovereign appears."}}}},
         {"Turn order", {{{"1 / DEFENDERS", "Each living defender spends one action, then control passes to the next. Inspecting, equipping, trading, and leaving Streets along a road are free."},
             {"2 / WORLD CARD", "After everyone acts, one shared card is drawn. Read it, then choose Resolve. Half of draws are quiet. The board waits while you read."},
-            {"3 / HOSTILES", "Rot ticks first, enemies act individually, then the god acts. Doom advances by 1 + chaos. Every fifth round, portals spawn one enemy per living defender across the whole map."}}}},
+            {"3 / HOSTILES", "Corrosion ticks first, enemies act individually, then the sovereign acts. Doom advances by 1 + instability. Every fifth round, portals spawn one enemy per living defender across the whole map."}}}},
         {"Travel", {{{"FOLLOW THE ARROWS", "Click a sector to inspect it; click Move to travel there. Only outgoing roads are allowed. Entering a sector does not guarantee a route back."},
             {"FREE EXITS & FLIGHTS", "Road movement out of Streets is free and your turn continues. Transport crew allows flights for the next defender phase. Other flights cost an action."},
             {"CHANGING ACCESS", "Road reversal changes one-way arrows. A cordon blocks entry but lets occupants leave; flights bypass cordons. A destroyed Bridge is permanently inaccessible, even to flights."}}}},
         {"Combat", {{{"HIT CHANCE", "Start at 80%. Lose 20 percentage points for each unmet stat requirement. Gain 5 per surplus aiming-stat point, up to 100%. Example: Strength 5 with a Strength 2 sword gives 95%."},
             {"DAMAGE & RESISTANCE", "Ranged aims with Precision, melee with Strength, psychic with Will. Heavy weapons also require Strength. Armor reduces physical damage; Will reduces psychic damage. True damage ignores both."},
-            {"PORTALS & GRENADES", "Portals have 6 HP: unguarded means automatic hits; guards require a hit roll; Wardens block weapon damage. Krak grenades always destroy portals or deal 5 true damage to enemies. Sector bonuses apply."}}}},
+            {"PORTALS & GRENADES", "Portals have 6 HP: unguarded means automatic hits; guards require a hit roll; Anchors block weapon damage. Breach grenades always destroy portals or deal 5 true damage to enemies. Sector bonuses apply."}}}},
         {"Orders & items", {{{"ATTACK, GUARD, SUPPRESS", "Attacks require a target in your sector. Guard reduces incoming physical or psychic hits by 3 this round. Suppress uses a ranged hit roll. On a hit, that enemy skips its next activation; no damage is dealt."},
             {"EQUIPMENT & TRADING", "Equipment shows your actual damage and hit chance. Equip for free. Trade gives one item to a living defender in your sector for free. Keep at least one weapon; duplicate weapons cannot transfer."},
             {"SEARCH & MARKET", "Search costs an action and finds loot. At Market, choose one of three offers for an action. Offers refresh each defender turn. Viewing or loading the game does not reroll them."}}}},
-        {"Sector bonuses", {{{"DEFENSE", "Barracks: +2 armor for defenders.\nCathedral: +4 Will for defenders.\nInfirmary: Rest fully heals and cures rot."},
+        {"Sector bonuses", {{{"DEFENSE", "Barracks: +2 armor for defenders.\nCathedral: +4 Will for defenders.\nInfirmary: Rest fully heals and cures corrosion."},
             {"ATTACKS", "Armory: +5 true damage on defender hits, including grenades.\nAlley: +20 percentage points to defender ranged accuracy.\nSlums: +2 physical damage to ALL melee attacks."},
-            {"MOVEMENT & SUPPLIES", "Streets: outgoing road movement is free.\nMarket: choose one of three items for an action.\nBridge: can be destroyed using a krak grenade. See Bridge collapse."}}}},
-        {"Recovery", {{{"REST & MEDKITS", "Rest spends your action to heal 5 HP. Resting at Infirmary fully heals you and cures rot. A medkit spends your action and one medkit to heal 8 HP and cure rot in any sector."},
-            {"ORDINARY DEFEAT", "When an attack or rot reduces you to zero HP, you recover at Infirmary with full HP. Chaos rises by 1. You cannot be attacked again during that hostile phase. Only world events lower chaos."},
-            {"PERMANENT DEATH", "Bridge collapse is the exception: defenders on the Bridge die permanently, including the one who destroys it. They never recover at Infirmary. The campaign ends if no defenders survive, unless the god dies too."}}}},
-        {"Bridge collapse", {{{"HOW TO DESTROY THE BRIDGE", "Stand on Bridge with a krak grenade. Choose Collapse Bridge, then confirm. This spends one grenade and your action. Throwing a grenade at an enemy or portal does not destroy the Bridge."},
-            {"ONLY IF THE GOD IS ON THE BRIDGE", "The god loses half its CURRENT HP, ignoring resistance, then moves to Slums. Damage rounds up: 56 HP becomes 28; 51 becomes 25. A god in another sector takes no damage and does not move."},
-            {"EVERYONE ELSE & THE CROSSING", "All defenders on Bridge die permanently, including the acting defender. Regular enemies there die and portals close. Bridge stays inaccessible. Slums loses its normal road exit. A god that appears later starts in Slums."}}}},
-        {"Enemies & the god", {{{"ENEMY ROLES", "Some enemies hold their sector; hunters follow roads toward defenders. Wardens shield portals. Psychic enemies test Will; plague enemies can inflict rot. Select a target to read its tactics."},
-            {"THE GOD APPEARS", "When doom reaches its deadline, the god arrives and the UI turns red. It has at least 50 base HP plus 6 per starting defender. It attacks locally or moves toward the nearest defender."},
-            {"NO MORE LAST STAND", "After the god appears, enemies fight and move normally even with no portals left. Neither enemies nor the god attempt last-stand summons. Suppression still skips an enemy's next activation."}}}},
+            {"MOVEMENT & SUPPLIES", "Streets: outgoing road movement is free.\nMarket: choose one of three items for an action.\nBridge: can be destroyed using a breach grenade. See Bridge collapse."}}}},
+        {"Recovery", {{{"REST & MEDKITS", "Rest spends your action to heal 5 HP. Resting at Infirmary fully heals you and cures corrosion. A medkit spends your action and one medkit to heal 8 HP and cure corrosion in any sector."},
+            {"ORDINARY DEFEAT", "When an attack or corrosion reduces you to zero HP, you recover at Infirmary with full HP. Instability rises by 1. You cannot be attacked again during that hostile phase. Only world events lower instability."},
+            {"PERMANENT DEATH", "Bridge collapse is the exception: defenders on the Bridge die permanently, including the one who destroys it. They never recover at Infirmary. The campaign ends if no defenders survive, unless the sovereign dies too."}}}},
+        {"Bridge collapse", {{{"HOW TO DESTROY THE BRIDGE", "Stand on Bridge with a breach grenade. Choose Collapse Bridge, then confirm. This spends one grenade and your action. Throwing a grenade at an enemy or portal does not destroy the Bridge."},
+            {"ONLY IF THE SOVEREIGN IS ON THE BRIDGE", "The sovereign loses half its CURRENT HP, ignoring resistance, then moves to Slums. Damage rounds up: 56 HP becomes 28; 51 becomes 25. A sovereign in another sector takes no damage and does not move."},
+            {"EVERYONE ELSE & THE CROSSING", "All defenders on Bridge die permanently, including the acting defender. Regular enemies there die and portals close. Bridge stays inaccessible. Slums loses its normal road exit. A sovereign that appears later starts in Slums."}}}},
+        {"Enemies & the sovereign", {{{"ENEMY ROLES", "Some enemies hold their sector; hunters follow roads toward defenders. Anchors shield portals. Psychic enemies test Will; corrosive enemies can inflict corrosion. Select a target to read its tactics."},
+            {"THE SOVEREIGN APPEARS", "When doom reaches its deadline, the sovereign arrives and the UI turns red. It has at least 50 base HP plus 6 per starting defender. It attacks locally or moves toward the nearest defender."},
+            {"NO MORE LAST STAND", "After the sovereign appears, enemies fight and move normally even with no portals left. Neither enemies nor the sovereign attempt last-stand summons. Suppression still skips an enemy's next activation."}}}},
         {"Saving & controls", {{{"SAVE YOUR CAMPAIGN", "Save or F5 writes your current campaign, including between phases. Archive chooses another file. Saving is manual unless you enable Autosave in Menu."},
             {"LEAVING THE GAME", "Menu offers exits to title or desktop, with or without saving. Leaving without saving discards progress since the last save. Closing the window opens Menu."},
             {"SHORTCUTS", "1-9: inspect sectors. I: Equipment. J: journal. H: manual.\nEscape: close a dialog or open Menu.\nMenu also controls animation speed."}}}}
@@ -621,7 +606,7 @@ void Gui::inventoryModal() {
     const bool canTrade = std::any_of(game->getPlayers().begin(), game->getPlayers().end(), [&](const Player& other) {
         return &other != &p && other.getAlive() && other.getSector() == p.getSector();
     });
-    draw.label(280, 744, "Medkits " + num(p.getSupply(Consumable::medkit)) + "    Krak grenades " + num(p.getSupply(Consumable::grenade)), 16, muted);
+    draw.label(280, 744, "Medkits " + num(p.getSupply(Consumable::medkit)) + "    Breach grenades " + num(p.getSupply(Consumable::grenade)), 16, muted);
     button("inventory-trade", {600, 793, 180, 42}, "Trade", [this] { tradePage = 0; tradeRecipient = 0; openModal(Modal::trade); }, canTrade && acceptsOrders(), false, "Give items to a defender in this sector. Free action.");
     button("inventory-close", {960, 793, 200, 42}, "Close", [this] { openModal(Modal::none); }, true, true);
 }
@@ -693,8 +678,8 @@ void Gui::bridgeModal() {
     }
     draw.paragraph(280,426,"Defenders lost: " + names,870,19,red,3);
     const bool bossHere = game->hasLivingBoss() && game->getBoss()->getSector()==9;
-    draw.paragraph(280,531,bossHere ? game->getBoss()->getName()+" is on Bridge: "+num(game->getBoss()->getHealth())+" HP becomes "+num(game->getBoss()->getHealth()/2)+" HP, then it moves to Slums. Regular enemies and portals here are destroyed." : "Regular enemies and portals on Bridge are destroyed. The god is not on Bridge, so it takes no damage and is not moved.",870,19,gold,3);
-    draw.label(280,643,"Costs 1 krak grenade. Losing the entire squad ends the campaign.",17,muted);
+    draw.paragraph(280,531,bossHere ? game->getBoss()->getName()+" is on Bridge: "+num(game->getBoss()->getHealth())+" HP becomes "+num(game->getBoss()->getHealth()/2)+" HP, then it moves to Slums. Regular enemies and portals here are destroyed." : "Regular enemies and portals on Bridge are destroyed. The sovereign is not on Bridge, so it takes no damage and is not moved.",870,19,gold,3);
+    draw.label(280,643,"Costs 1 breach grenade. Losing the entire squad ends the campaign.",17,muted);
     button("bridge-cancel",{280,756,410,56},"Cancel",[this] { openModal(Modal::none); });
     button("bridge-confirm",{750,756,410,56},"Destroy Bridge / sacrifice defenders",[this] {
         openModal(Modal::none); perform({ActionType::collapseBridge});
@@ -705,7 +690,7 @@ void Gui::customModal() {
     int cost = 0; for (int stat : r.stats) cost += Game::statCost(stat);
     draw.label(280, 274, "Build your defender", 32, text);
     draw.label(280, 328, "POINTS SPENT  " + num(cost) + " / 50", 20, cost > 50 ? red : teal);
-    draw.paragraph(280, 368, "HP = 1 + 3 x Vitality. Armor cap: 4; other stats: 9. A bolter pistol is included.", 880, 17, muted, 3);
+    draw.paragraph(280, 368, "HP = 1 + 3 x Vitality. Armor cap: 4; other stats: 9. A rivet pistol is included.", 880, 17, muted, 3);
     const std::array<std::string, 5> labels {{"Vitality", "Armor", "Strength", "Precision", "Will"}};
     for (int i = 0; i < 5; ++i) {
         int y = 453 + i * 56;
@@ -912,12 +897,12 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     if (!screenshotPath.empty()) {
         std::vector<std::pair<Icon,std::string>> symbols;
         for (const auto& s : sectors()) symbols.push_back({sectorIcon(s.id), s.name});
-        for (std::size_t i = 0; i < characters().size(); ++i) symbols.push_back({static_cast<Icon>(static_cast<int>(Icon::marine) + i), characters()[i].name});
-        symbols.push_back({Icon::defender, "Custom defender"}); symbols.push_back({Icon::portal, "Warp portal"});
+        for (std::size_t i = 0; i < characters().size(); ++i) symbols.push_back({static_cast<Icon>(static_cast<int>(Icon::bulwark) + i), characters()[i].name});
+        symbols.push_back({Icon::defender, "Custom defender"}); symbols.push_back({Icon::portal, "Breach portal"});
         for (std::size_t i = 0; i < enemyDefinitions().size(); ++i) symbols.push_back({enemyIcon(static_cast<int>(i)), enemyDefinitions()[i].name});
         for (const auto& b : bosses()) symbols.push_back({patronIcon(static_cast<int>(b.id)), b.name});
         for (const auto& entry : std::vector<std::pair<Icon,std::string>>{{Icon::insignia,"Watch insignia"},{Icon::supplies,"Supplies"},
-            {Icon::search,"Search"},{Icon::shield,"Guard"},{Icon::clock,"Hold position"},{Icon::grenade,"Krak grenade"},{Icon::skull,"Defeat"}}) symbols.push_back(entry);
+            {Icon::search,"Search"},{Icon::shield,"Guard"},{Icon::clock,"Hold position"},{Icon::grenade,"Breach grenade"},{Icon::skull,"Defeat"}}) symbols.push_back(entry);
         draw.fill({0,0,Width,Height}, background);
         draw.label(32, 23, "THE LAST WATCH / COMPLETE ICON SET", 22, gold);
         for (std::size_t i = 0; i < symbols.size(); ++i) {
@@ -947,7 +932,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
             clickTest("tutorial-practice");
             if (step == 3) {
                 clickTest("inventory-next"); clickTest("equip-9");
-                expect(game->currentPlayer().getWeapon() == WeaponId::forceHalberd, "expanded inventory pages equip new weapons");
+                expect(game->currentPlayer().getWeapon() == WeaponId::resonanceGlaive, "expanded inventory pages equip new weapons");
                 if (!screenshotPath.empty()) screenshot(screenshotPath + ".weapons.bmp");
                 clickTest("inventory-close");
             } else {
@@ -968,9 +953,9 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     expect(squadSize == 4, "four-defender setup");
     if (!screenshotPath.empty()) screenshot(screenshotPath + ".setup.bmp");
     clickTest("class-prev-0"); expect(recruits[0].preset == 4, "previous arrow wraps to custom");
-    clickTest("class-next-0"); expect(recruits[0].preset == 0, "next arrow returns to Marine");
+    clickTest("class-next-0"); expect(recruits[0].preset == 0, "next arrow returns to Bulwark");
     for (int i = 0; i < 4; ++i) clickTest("class-0");
-    clickTest("custom-0"); clickTest("weapon-next"); expect(recruits[0].startingWeapon == 2, "custom selects force staff"); clickTest("weapon-prev"); expect(recruits[0].startingWeapon == 1, "custom weapon cycles backward"); clickTest("stat-plus-2");
+    clickTest("custom-0"); clickTest("weapon-next"); expect(recruits[0].startingWeapon == 2, "custom selects resonance staff"); clickTest("weapon-prev"); expect(recruits[0].startingWeapon == 1, "custom weapon cycles backward"); clickTest("stat-plus-2");
     expect(recruits[0].stats[2] == 4, "increment is blocked at the point-buy limit");
     clickTest("stat-minus-2"); clickTest("stat-plus-3");
     expect(recruits[0].stats[3] == 4, "increment is blocked when its five-point cost exceeds four remaining points");
@@ -1085,7 +1070,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     selectTarget(-1);
     if (game->portalShielded(portalSector)) {
         const auto before = snapshot(*game); clickTest("attack");
-        expect(snapshot(*game) == before, "Warden disables weapon attacks on its portal");
+        expect(snapshot(*game) == before, "Anchor disables weapon attacks on its portal");
     }
     clickTest("grenade");
     expect(presentation == Presentation::action && !game->getCombatEvents().empty(), "grenade produces a combat animation");
@@ -1094,7 +1079,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     expect(std::none_of(game->getPortals().begin(), game->getPortals().end(), [portalSector](const Portal& p) { return p.sector == portalSector; }), "grenade collapses portal even through shield");
     settleTest();
     // Reach the last stand through public gameplay with a cooperative squad.
-    Game patrol(BossId::khorne, 42);
+    Game patrol(BossId::emberRegent, 42);
     for (int i = 0; i < 4; ++i) patrol.addPreset(1, "Rift hunter " + num(i + 1));
     patrol.start(); game = std::move(patrol); history.clear(); gatherLog(); syncSelection(); beginStage(Presentation::idle);
     for (int order = 0; order < 60 && game->getOutcome() == Outcome::ongoing && !game->isLastStand(); ++order) {
@@ -1109,7 +1094,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
         else if (game->currentPlayer().getSupply(Consumable::grenade)) perform({ActionType::grenadePortal});
         else if (!game->portalShielded(here)) perform({ActionType::attackPortal});
         else {
-            for (const auto& enemy : game->getEnemies()) if (enemy.getSector() == here && enemy.definition().role == EnemyRole::warden) {
+            for (const auto& enemy : game->getEnemies()) if (enemy.getSector() == here && enemy.definition().role == EnemyRole::anchor) {
                 const int id = enemy.getId(); perform({ActionType::attackEnemy, id}); break;
             }
         }
@@ -1123,7 +1108,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     save(); load(savePath);
     expect(game->isLastStand() && game->getOutcome() == Outcome::ongoing, "GUI load retains last-stand state");
     // Trade through actual inventory buttons; inspect does not spend an action.
-    game = Game(BossId::khorne,42); game->addPreset(0,"Trader"); game->addPreset(1,"Recipient"); game->start();
+    game = Game(BossId::emberRegent,42); game->addPreset(0,"Trader"); game->addPreset(1,"Recipient"); game->start();
     history.clear(); gatherLog(); syncSelection(); beginStage(Presentation::idle);
     clickTest("equipment"); render();
     expect(std::none_of(buttons.begin(),buttons.end(),[](const Button& b){return b.id=="inventory-next";}),"short inventory hides pagination");
@@ -1133,7 +1118,7 @@ void Gui::smokeTest(const std::string& screenshotPath) {
     expect(game->getPlayers()[0].getSupply(Consumable::medkit)==0 && game->getPlayers()[1].getSupply(Consumable::medkit)==2 && game->getPlayerIndex()==0,"GUI transfers one medkit for free");
     clickTest("trade-close"); clickTest("inventory-close");
 
-    game = Game(BossId::khorne,42); game->addPreset(0,"Market visitor"); game->start();
+    game = Game(BossId::emberRegent,42); game->addPreset(0,"Market visitor"); game->start();
     history.clear(); gatherLog(); syncSelection(); beginStage(Presentation::idle);
     for (int moves=0;moves<20 && game->currentPlayer().getSector()!=8 && game->getOutcome()==Outcome::ongoing;++moves) {
         const auto next=game->routeStep(game->currentPlayer().getSector(),8);

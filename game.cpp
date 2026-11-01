@@ -20,45 +20,45 @@ std::string location(int sector) { return sectorAt(sector).name; }
 
 const std::vector<CharacterDef>& characters() {
     static const std::vector<CharacterDef> values {
-        {"Space Marine", 16, 3, 4, 3, 1, WeaponId::heavyBolter, "Heavy firepower and armor; vulnerable to psychic attacks."},
-        {"Guardsman", 16, 2, 2, 5, 2, WeaponId::lasgun, "Accurate ranged fire; starts with an extra krak grenade."},
-        {"Sanctioned Psyker", 13, 1, 1, 3, 5, WeaponId::staff, "Psychic attacks and strong resistance to enemy sorcery."},
-        {"Sister of Battle", 16, 2, 3, 3, 4, WeaponId::sword, "Balanced melee fighter; strong physical and psychic defenses."}
+        {"Bulwark", 16, 3, 4, 3, 1, WeaponId::rotaryRiveter, "Heavy firepower and armor; vulnerable to psychic attacks."},
+        {"Trailguard", 16, 2, 2, 5, 2, WeaponId::beamCarbine, "Accurate ranged fire; starts with an extra breach grenade."},
+        {"Resonant", 13, 1, 1, 3, 5, WeaponId::staff, "Psychic attacks and strong resistance to hostile signals."},
+        {"Duskblade", 16, 2, 3, 3, 4, WeaponId::sword, "Balanced melee fighter; strong physical and psychic defenses."}
     };
     return values;
 }
 QuickDefender quickDefender(std::uint32_t seed, int previous) {
     std::mt19937 names(seed);
     const int preset = previous < 0 ? std::uniform_int_distribution<int>(0, 3)(names) : (previous + 1) % 4;
-    static const std::array<const char*, 4> titles {{"Brother", "Trooper", "Seer", "Sister"}};
-    static const std::array<const char*, 8> callsigns {{"Aquila", "Voss", "Severin", "Morrow", "Corvin", "Sol", "Valen", "Rook"}};
+    static const std::array<const char*, 4> titles {{"Shield", "Scout", "Listener", "Blade"}};
+    static const std::array<const char*, 8> callsigns {{"Kestrel", "Flint", "Lumen", "Tarn", "Cairn", "Sol", "Vale", "Rook"}};
     return {preset, std::string(titles[preset]) + " " + callsigns[std::uniform_int_distribution<int>(0, 7)(names)]};
 }
 const std::vector<EventCard>& eventCards() {
     static const std::vector<EventCard> cards {
         {"A Moment of Silence", "RESPITE", "For one breath, even the guns are still.", "No additional board effect. Take stock before the enemy phase.", 0},
-        {"Munitorum Airlift", "SUPPLY", "Through the smoke, loyal engines answer.", "Every defender receives one random consumable.", 1},
-        {"Warp Procession", "REINFORCEMENT", "A chanting procession emerges from the smoke.", "A Rift Acolyte spawns in Market (8). It attacks local defenders with psychic damage.", 2},
-        {"Breach in the Veil", "WARP BREACH", "A new wound opens in the world.", "Open a 6 HP portal in a random eligible sector. Barracks and Infirmary are protected.", 3},
+        {"Relay Airlift", "SUPPLY", "Supply skiffs follow the last working beacon.", "Every defender receives one random consumable.", 1},
+        {"Signal Procession", "REINFORCEMENT", "A broken carrier signal assembles itself into a machine.", "A Breach tuner spawns in Market (8). It attacks local defenders with psychic damage.", 2},
+        {"Breach in the Veil", "SIGNAL BREACH", "A new wound opens in the world.", "Open a 6 HP portal in a random eligible sector. Barracks and Infirmary are protected.", 3},
         {"Twisting Streets", "TERRAIN", "The road home now leads away from it.", "Reverse all one-way roads for this round and the next. Two-way roads stay two-way. All movement follows the changed arrows.", 4},
-        {"The Emperor Protects", "RESPITE", "A thousand voices answer the darkness.", "Reduce chaos by 1, to a minimum of zero.", 0},
+        {"The Beacon Holds", "RESPITE", "The district reconnects its relays, one rooftop at a time.", "Reduce instability by 1, to a minimum of zero.", 0},
         {"Lost Hours", "OMEN", "The cathedral bell tolls twice for an hour that never was.", "Advance doom by an extra 2. The normal round advance still happens afterward.", 5},
-        {"Hunting Pack", "REINFORCEMENT", "Something has caught your scent.", "The patron god sends a hunting daemon to a random portal, or Slums (7) if none remain. It pursues defenders along outgoing roads.", 2},
-        {"Field Hospital", "SUPPLY", "The wounded return to the line.", "Every defender heals 4 HP and is cured of rot.", 1},
-        {"Arsenal Unsealed", "SUPPLY", "An ancient vault recognizes a loyal hand.", "One random defender receives a weapon. Duplicate weapons become a consumable.", 1},
+        {"Hunting Pack", "REINFORCEMENT", "Something has caught your scent.", "The sovereign sends a hunting construct to a random portal, or Slums (7) if none remain. It pursues defenders along outgoing roads.", 2},
+        {"Field Hospital", "SUPPLY", "The wounded return to the line.", "Every defender heals 4 HP and is cured of corrosion.", 1},
+        {"Arsenal Unsealed", "SUPPLY", "A maintenance key opens a forgotten equipment vault.", "One random defender receives a weapon. Duplicate weapons become a consumable.", 1},
         {"Supply Convoy", "WORLD CHANGE", "Supplies reach the district under cover of smoke.", "Every defender receives one medkit.", 1},
         {"The Long March", "MANEUVER", "They are moving. All of them.", "Every regular enemy moves one random outgoing road, except during the last stand. Current road reversals apply. The boss stays put.", 4},
-        {"Rift Bulwark", "REINFORCEMENT", "The gate has found its guardian.", "Add a Rift Warden at a portal without one. Its shield blocks weapons, but not krak grenades. No eligible portal: no effect.", 3},
-        {"Chosen of the Dark God", "REINFORCEMENT", "The patron's mark burns in the smoke.", "A daemon devoted to the summoned Chaos god appears in Slums (7). Inspect its tactics before engaging.", 2},
-        {"Warp Collapse", "RIFT DESTRUCTION", "One wound in reality finally closes.", "Destroy one random portal. Before the god manifests, surviving enemies enter last stand if no portals remain.", 3},
-        {"Orbital Lance", "ENEMY DESTRUCTION", "A precise beam finds its mark through the smoke.", "Destroy one random regular enemy. Bosses are unaffected.", 2},
+        {"Anchor Deployment", "REINFORCEMENT", "The gate has found its guardian.", "Add a Gate anchor at a portal without one. Its shield blocks weapons, but not breach grenades. No eligible portal: no effect.", 3},
+        {"Sovereign Emissary", "REINFORCEMENT", "An unfamiliar command signature takes physical form.", "A construct controlled by the invading sovereign appears in Slums (7). Inspect its tactics before engaging.", 2},
+        {"Breach Collapse", "RIFT DESTRUCTION", "One wound in reality finally closes.", "Destroy one random portal. Before the sovereign manifests, surviving enemies enter last stand if no portals remain.", 3},
+        {"Orbital Pinpoint", "ENEMY DESTRUCTION", "A precise beam finds its mark through the smoke.", "Destroy one random regular enemy. Bosses are unaffected.", 2},
         {"Quarantine Cordon", "SECTOR CLOSURE", "Blast doors descend across the district.", "Close one eligible sector to entry through the next round. Occupants may leave. Other open sectors remain connected.", 4},
-        {"Emergency Teleport", "TRANSPORT", "The beacon locks onto every loyal signal.", "Transport each defender to a random different open sector. This costs no player action and causes no damage.", 3},
+        {"Emergency Teleport", "TRANSPORT", "The relay locks onto every defender's transponder.", "Transport each defender to a random different open sector. This costs no player action and causes no damage.", 3},
         {"Ashfall", "DEFENDER ACCURACY", "A curtain of ash swallows every sight line.", "Defender weapon and suppression hit chances fall by 20 percentage points through the next round. Grenades are unaffected.", 5},
         {"Blinding Flare", "ENEMY ACCURACY", "White light burns across the enemy's vision.", "Enemy and boss attack rolls take -4 (20 percentage points) through the next round. Ritual chances are unaffected.", 0},
-        {"Purge the Streets", "ENEMY DESTRUCTION", "Loyal artillery answers the distress signal.", "Destroy all regular enemies in one random occupied sector. Defenders and bosses are unaffected.", 2},
-        {"Null Resonance", "RIFT DESTRUCTION", "The city falls silent as every rift implodes.", "Destroy every portal. Before the god manifests, surviving enemies enter last stand and attempt to summon new rifts.", 3},
-        {"Transport crew", "TRANSPORT", "Loyal pilots offer a way above the broken streets.", "During the next defender phase, each defender may spend their move action to travel to any sector, ignoring roads and sector closures. Enemies still follow roads.", 4}
+        {"Purge the Streets", "ENEMY DESTRUCTION", "District artillery answers the distress signal.", "Destroy all regular enemies in one random occupied sector. Defenders and bosses are unaffected.", 2},
+        {"Null Resonance", "RIFT DESTRUCTION", "The city falls silent as every rift implodes.", "Destroy every portal. Before the sovereign manifests, surviving enemies enter last stand and attempt to summon new rifts.", 3},
+        {"Transport crew", "TRANSPORT", "Volunteer pilots offer a way above the broken streets.", "During the next defender phase, each defender may spend their move action to travel to any sector, ignoring roads and sector closures. Enemies still follow roads.", 4}
     };
     return cards;
 }
@@ -75,7 +75,7 @@ Game::Game(BossId selected, std::uint32_t randomSeed) : patron(selected), seed(r
 }
 int Game::roll(int low, int high) { return std::uniform_int_distribution<int>(low, high)(rng); }
 Game Game::tutorial(int sector) {
-    Game g(BossId::khorne, 42);
+    Game g(BossId::emberRegent, 42);
     g.addPreset(0, "Training Defender"); g.start();
     g.enemies.clear(); g.portals = {{2, 6}, {9, 6}};
     g.spawnEnemy(2, 0); g.players[0].moveTo(sector);
@@ -110,19 +110,19 @@ void Game::start() {
     if (started || players.empty()) throw std::logic_error("Create one to four characters before starting once.");
     started = true;
     spawnPortal(); spawnPortal();
-    if (patron == BossId::tzeentch) { spawnPortal(); spawnPortal(); }
+    if (patron == BossId::prismOracle) { spawnPortal(); spawnPortal(); }
     for (std::size_t i = 0; i < 2 * players.size(); ++i) {
         const auto& rift = portals.at(static_cast<std::size_t>(roll(0, static_cast<int>(portals.size()) - 1)));
         spawnEnemy(rift.sector, i % 2 == 0 ? patronEnemy() : 4);
     }
-    record("The astropath falls silent. " + getBossDef().name + " is reaching for this city.");
-    record("Close every portal and defeat every enemy, OR defeat the manifested god to save the city. First portal wave: end of round 5.");
+    record("Veyra's relay network falls silent. " + getBossDef().name + " is reaching for this city.");
+    record("Close every portal and defeat every enemy, OR defeat the manifested sovereign to save the city. First portal wave: end of round 5.");
     refreshMarket();
 }
 void Game::spawnEnemy(int sector, int kind) {
     if (enemies.size() >= 64) {
-        chaos = std::min(6, chaos + 1);
-        record("The streets overflow with enemies. Chaos rises.");
+        instability = std::min(6, instability + 1);
+        record("The streets overflow with enemies. Instability rises.");
         return;
     }
     enemies.emplace_back(nextEnemyId++, kind, sector);
@@ -149,7 +149,7 @@ void Game::announceLastStand(bool previous) {
     if (!previous && isLastStand())
         record("ENEMY LAST STAND / All portals are closed. Each surviving enemy stops fighting and moving to attempt a portal summon: 10% per hostile activation. Suppression skips an activation. A new portal restores normal behavior. Defeat every enemy and close every portal to win.");
     else if (previous && boss && outcome == Outcome::ongoing)
-        record("LAST STAND ENDS / The god has manifested. Enemies resume normal behavior; summoning rituals are disabled for the rest of the campaign.");
+        record("LAST STAND ENDS / The sovereign has manifested. Enemies resume normal behavior; summoning rituals are disabled for the rest of the campaign.");
     else if (previous && !isLastStand() && !portals.empty() && outcome == Outcome::ongoing)
         record("THE RIFT REOPENS / The last stand ends. Remaining enemies resume normal behavior immediately.");
 }
@@ -165,8 +165,8 @@ void Game::grantLoot(Player& player, bool weaponPreferred) {
         WeaponId found;
         switch (player.getSector()) {
             case 2: found = static_cast<WeaponId>(roll(2, static_cast<int>(weapons().size()) - 1)); break;
-            case 5: found = roll(0, 1) ? WeaponId::staff : WeaponId::forceHalberd; break;
-            case 1: found = roll(1, 3) == 1 ? WeaponId::marksmanBolter : WeaponId::bolter; break;
+            case 5: found = roll(0, 1) ? WeaponId::staff : WeaponId::resonanceGlaive; break;
+            case 1: found = roll(1, 3) == 1 ? WeaponId::needleRifle : WeaponId::rivetRifle; break;
             default: found = static_cast<WeaponId>(roll(1, static_cast<int>(weapons().size()) - 1)); break;
         }
         if (player.giveWeapon(found)) {
@@ -248,7 +248,7 @@ ActionResult Game::act(Action action, bool automatic) {
         case ActionType::grenadeEnemy:
             if (enemy == enemies.end()) return {false, "That enemy is not in your sector."};
             if (action.type == ActionType::grenadeEnemy) {
-                if (p.supplies[1] == 0) return {false, "No krak grenades remaining."};
+                if (p.supplies[1] == 0) return {false, "No breach grenades remaining."};
                 --p.supplies[1];
                 strike(*enemy, true);
             } else strike(*enemy, false);
@@ -256,13 +256,13 @@ ActionResult Game::act(Action action, bool automatic) {
         case ActionType::attackPortal:
         case ActionType::grenadePortal:
             if (portal == portals.end()) return {false, "There is no portal in your sector."};
-            if (action.type == ActionType::attackPortal && portalShielded(here)) return {false, "A Rift Warden shields this portal. Defeat the Warden first."};
+            if (action.type == ActionType::attackPortal && portalShielded(here)) return {false, "A Gate anchor shields this portal. Defeat the Anchor first."};
             if (action.type == ActionType::grenadePortal) {
-                if (p.supplies[1] == 0) return {false, "No krak grenades remaining."};
+                if (p.supplies[1] == 0) return {false, "No breach grenades remaining."};
                 --p.supplies[1];
                 const int remaining = portal->health; portal->health = 0;
-                combatEvents.push_back({p.getName(), "Warp portal", here, remaining, CombatStyle::grenade, true, true, true});
-                record("Krak grenade collapses the portal.");
+                combatEvents.push_back({p.getName(), "Breach portal", here, remaining, CombatStyle::grenade, true, true, true});
+                record("Breach grenade collapses the portal.");
             } else {
                 const bool hit = !guarded || playerHits(p);
                 const int dealt = hit ? std::min(portal->health, playerDamage(p,p.getWeapon()) + playerTrueBonus(p)) : 0;
@@ -271,14 +271,14 @@ ActionResult Game::act(Action action, bool automatic) {
                     portal->health -= dealt;
                     record("Portal takes " + std::to_string(dealt) + " damage; " + std::to_string(portal->health) + " HP remains.");
                 }
-                combatEvents.push_back({p.getName(), "Warp portal", here, dealt, style, hit, true, portal->health == 0});
+                combatEvents.push_back({p.getName(), "Breach portal", here, dealt, style, hit, true, portal->health == 0});
             }
             break;
         case ActionType::attackBoss:
         case ActionType::grenadeBoss:
             if (!bossHere) return {false, "The boss is not in your sector."};
             if (action.type == ActionType::grenadeBoss) {
-                if (p.supplies[1] == 0) return {false, "No krak grenades remaining."};
+                if (p.supplies[1] == 0) return {false, "No breach grenades remaining."};
                 --p.supplies[1];
             }
             strike(*boss, action.type == ActionType::grenadeBoss);
@@ -288,7 +288,7 @@ ActionResult Game::act(Action action, bool automatic) {
             grantLoot(p, here == 1 || here == 2 || here == 5);
             break;
         case ActionType::rest:
-            if (p.getHealth() == p.getMaxHealth() && p.poison == 0) return {false, "You are already at full health and free of rot."};
+            if (p.getHealth() == p.getMaxHealth() && p.poison == 0) return {false, "You are already at full health and free of corrosion."};
             record(p.getName() + " rests and restores " + std::to_string(p.heal(here == 6 ? p.getMaxHealth() : 5)) + " HP.");
             if (here == 6) p.poison = 0;
             break;
@@ -296,7 +296,7 @@ ActionResult Game::act(Action action, bool automatic) {
             if (p.supplies[0] == 0) return {false, "No medkits remaining."};
             if (p.getHealth() == p.getMaxHealth() && p.poison == 0) return {false, "You do not need a medkit."};
             --p.supplies[0]; p.poison = 0;
-            record(p.getName() + " uses a medkit: +" + std::to_string(p.heal(8)) + " HP, rot cured.");
+            record(p.getName() + " uses a medkit: +" + std::to_string(p.heal(8)) + " HP, corrosion cured.");
             break;
         case ActionType::guard:
             p.guarding = true;
@@ -329,7 +329,7 @@ ActionResult Game::act(Action action, bool automatic) {
         }
         case ActionType::collapseBridge: {
             if (here != 9 || bridgeCollapsed) return {false,"Collapse the Bridge while standing on it."};
-            if (!p.supplies[1]) return {false,"A krak grenade is required."};
+            if (!p.supplies[1]) return {false,"A breach grenade is required."};
             --p.supplies[1]; bridgeCollapsed = true; sectorClosures[8] = 0;
             record("BRIDGE COLLAPSED / The crossing is permanently destroyed.");
             for (auto& e : enemies) if (e.getSector() == 9) e.takeDamage(damageType::trueDamage,e.getHealth());
@@ -444,7 +444,7 @@ bool Game::canMove(int from, int to) const {
 }
 bool Game::portalShielded(int sector) const {
     return std::any_of(enemies.begin(), enemies.end(), [sector](const Enemy& e) {
-        return e.getAlive() && e.getSector() == sector && e.definition().role == EnemyRole::warden;
+        return e.getAlive() && e.getSector() == sector && e.definition().role == EnemyRole::anchor;
     });
 }
 void Game::finishAction() {
@@ -509,13 +509,13 @@ void Game::applyWorldCard() {
         case 2: spawnEnemy(8, 3); break;
         case 3: spawnPortal(); break;
         case 4: reversedRounds = 2; record("ROAD REVERSAL / All one-way roads reverse through the next round. Follow the new arrows."); break;
-        case 5: chaos = std::max(0, chaos - 1); record("Chaos falls by up to 1."); break;
+        case 5: instability = std::max(0, instability - 1); record("Instability falls by up to 1."); break;
         case 6: doom += 2; record("Two hours vanish. Doom advances by an extra 2."); break;
         case 7: {
             const int sector = portals.empty() ? 7 : portals.at(static_cast<std::size_t>(roll(0, static_cast<int>(portals.size()) - 1))).sector;
             spawnEnemy(sector, patronEnemy(true)); break;
         }
-        case 8: for (auto& p : players) if (p.getAlive()) { p.poison = 0; record(p.getName() + " recovers " + std::to_string(p.heal(4)) + " HP; rot cured."); } break;
+        case 8: for (auto& p : players) if (p.getAlive()) { p.poison = 0; record(p.getName() + " recovers " + std::to_string(p.heal(4)) + " HP; corrosion cured."); } break;
         case 9: grantLoot(randomPlayer(), true); break;
         case 10:
             for (auto& p : players) grantSupply(p, Consumable::medkit);
@@ -531,7 +531,7 @@ void Game::applyWorldCard() {
             std::vector<int> eligible;
             for (const auto& portal : portals) if (!portalShielded(portal.sector)) eligible.push_back(portal.sector);
             if (!eligible.empty()) spawnEnemy(eligible.at(static_cast<std::size_t>(roll(0, static_cast<int>(eligible.size()) - 1))), 4);
-            else record("No unshielded portal remains. No Warden arrives.");
+            else record("No unshielded portal remains. No Anchor arrives.");
             break;
         }
         case 13: spawnEnemy(7, patronEnemy()); break;
@@ -541,7 +541,7 @@ void Game::applyWorldCard() {
             break;
         case 15:
             if (!enemies.empty()) { auto& e = enemies.at(roll(0, static_cast<int>(enemies.size()) - 1)); e.takeDamage(damageType::trueDamage, e.getHealth()); cleanBattlefield(randomPlayer()); }
-            else record("No regular enemy remains in the lance's sights.");
+            else record("No regular enemy remains in the orbital array's sights.");
             break;
         case 16: closeSector(); break;
         case 17:
@@ -578,15 +578,15 @@ std::vector<std::size_t> Game::targetsAt(int sector) const {
 }
 void Game::recover(Player& player) {
     player.moveTo(6); player.heal(); player.poison = 0; player.recovering = true; player.guarding = false;
-    chaos = std::min(6, chaos + 1);
-    record(player.getName() + " falls! Evacuated to the Infirmary at full HP, protected for this phase. Chaos +1.");
+    instability = std::min(6, instability + 1);
+    record(player.getName() + " falls! Evacuated to the Infirmary at full HP, protected for this phase. Instability +1.");
 }
 int Game::harm(Player& player, damageType type, int damage, const std::string& source, bool infect) {
     if (!player.getAlive() || player.recovering) return 0;
     const int dealt = player.takeDamage(type, std::max(0, damage - (player.guarding && type != damageType::trueDamage ? 3 : 0)));
     record(source + " hits " + player.getName() + " for " + std::to_string(dealt) + " damage.");
     if (!player.getAlive()) recover(player);
-    else if (dealt > 0 && infect) { player.poison = 2; record(player.getName() + " suffers rot (2 rounds)."); }
+    else if (dealt > 0 && infect) { player.poison = 2; record(player.getName() + " suffers corrosion (2 rounds)."); }
     return dealt;
 }
 int Game::nearestDestination(int from) const {
@@ -602,7 +602,7 @@ int Game::nearestDestination(int from) const {
 EnemyIntent Game::enemyIntent() const {
     if (!rotResolved) {
         const bool active = std::any_of(players.begin(), players.end(), [](const Player& p) { return p.getPoison() > 0 && !p.isRecovering(); });
-        return {"Lingering rot", "Existing infections tick once before enemy actions.", 0, 0, active};
+        return {"Lingering corrosion", "Existing infections tick once before enemy actions.", 0, 0, active};
     }
     if (enemyCursor < static_cast<int>(enemies.size())) {
         const auto& e = enemies.at(enemyCursor);
@@ -610,8 +610,8 @@ EnemyIntent Game::enemyIntent() const {
         const std::string name = e.getName();
         if (e.suppressed) return {name, "Suppressed: skips its action this phase.", here, here, true};
         if (isLastStand()) return {name, "LAST STAND / Holds position and attempts to summon a portal (10% chance).", here, here, true};
-        if (!targetsAt(here).empty()) return {name, "Attacks a defender in " + location(here) + ". " + std::to_string(e.getAttackDamage() + chaos + (here == 7 && e.getAttackType() == damageType::physical ? 2 : 0)) + (e.getAttackType() == damageType::psychic ? " psychic" : " physical") + " damage before resistance.", here, here, true};
-        if (e.definition().role == EnemyRole::hunter || e.definition().role == EnemyRole::plagueHunter) {
+        if (!targetsAt(here).empty()) return {name, "Attacks a defender in " + location(here) + ". " + std::to_string(e.getAttackDamage() + instability + (here == 7 && e.getAttackType() == damageType::physical ? 2 : 0)) + (e.getAttackType() == damageType::psychic ? " psychic" : " physical") + " damage before resistance.", here, here, true};
+        if (e.definition().role == EnemyRole::hunter || e.definition().role == EnemyRole::rustHunter) {
             const int dest = nearestDestination(here);
             const int step = routeStep(here, dest);
             if (step != here) return {name, "Moves toward " + location(dest) + ". Cannot attack while moving.", here, step, true};
@@ -628,14 +628,14 @@ EnemyIntent Game::enemyIntent() const {
     return {"All clear", "No eligible targets.", 0, 0, false};
 }
 void Game::attackAt(int sector, int damage, damageType type, int accuracy, const std::string& source, bool infect) {
-    const int attacks = patron == BossId::slaanesh ? 2 : 1;
-    for (int i = 0; i < attacks && chaos < 6; ++i) {
+    const int attacks = patron == BossId::echoWeaver ? 2 : 1;
+    for (int i = 0; i < attacks && instability < 6; ++i) {
         const auto targets = targetsAt(sector);
         if (targets.empty()) break;
         auto& p = players.at(targets.at(static_cast<std::size_t>(roll(0, static_cast<int>(targets.size()) - 1))));
         record(source + " targets " + p.getName() + ".");
         const bool hit = attackHits(accuracy - (enemyAimRounds ? 4 : 0), 12);
-        const int dealt = hit ? harm(p, type, damage + chaos + (sector == 7 && type == damageType::physical ? 2 : 0), source, infect) : 0;
+        const int dealt = hit ? harm(p, type, damage + instability + (sector == 7 && type == damageType::physical ? 2 : 0), source, infect) : 0;
         combatEvents.push_back({source, p.getName(), sector, dealt,
             type == damageType::psychic ? CombatStyle::psychic : CombatStyle::melee, hit, false, p.isRecovering()});
     }
@@ -643,7 +643,7 @@ void Game::attackAt(int sector, int damage, damageType type, int accuracy, const
 void Game::resolveEnemyStep() {
     const auto intent = enemyIntent();
     if (!rotResolved) {
-        for (auto& p : players) if (p.poison > 0 && !p.recovering) { --p.poison; harm(p, damageType::trueDamage, 1, "Rot", false); }
+        for (auto& p : players) if (p.poison > 0 && !p.recovering) { --p.poison; harm(p, damageType::trueDamage, 1, "Corrosion", false); }
         rotResolved = true; return;
     }
     if (enemyCursor < static_cast<int>(enemies.size())) {
@@ -653,7 +653,7 @@ void Game::resolveEnemyStep() {
         if (!targetsAt(e.getSector()).empty()) {
             attackAt(e.getSector(), e.getAttackDamage(), e.getAttackType(),
                      e.getAttackType() == damageType::psychic ? e.getWill() : e.getStrength(), intent.name,
-                     patron == BossId::nurgle || e.definition().role == EnemyRole::infector || e.definition().role == EnemyRole::plagueHunter);
+                     patron == BossId::rustGardener || e.definition().role == EnemyRole::infector || e.definition().role == EnemyRole::rustHunter);
         } else if (intent.active && intent.destination != intent.sector) {
             e.moveTo(intent.destination); record(intent.name + " advances to " + location(e.getSector()) + ".");
         }
@@ -661,8 +661,8 @@ void Game::resolveEnemyStep() {
     }
     if (!bossResolved && boss && boss->getAlive()) {
         if (!targetsAt(boss->getSector()).empty()) {
-            const int rage = patron == BossId::khorne && boss->getHealth() * 2 <= boss->getMaxHealth() ? 2 : 0;
-            attackAt(boss->getSector(), getBossDef().damage + rage, getBossDef().type, 4, boss->getName(), patron == BossId::nurgle);
+            const int rage = patron == BossId::emberRegent && boss->getHealth() * 2 <= boss->getMaxHealth() ? 2 : 0;
+            attackAt(boss->getSector(), getBossDef().damage + rage, getBossDef().type, 4, boss->getName(), patron == BossId::rustGardener);
         } else if (intent.active && intent.destination != intent.sector) {
             boss->moveTo(intent.destination); record(boss->getName() + " advances to " + location(boss->getSector()) + ". It cannot attack while moving.");
         }
@@ -671,11 +671,11 @@ void Game::resolveEnemyStep() {
 }
 void Game::resolveEnemies() {
     record("ENEMY PHASE"); enemyCursor = 0; rotResolved = false; bossResolved = false;
-    while (chaos < 6 && (!rotResolved || enemyCursor < static_cast<int>(enemies.size()) || !bossResolved)) resolveEnemyStep();
+    while (instability < 6 && (!rotResolved || enemyCursor < static_cast<int>(enemies.size()) || !bossResolved)) resolveEnemyStep();
 }
 void Game::finishRound() {
-    doom += 1 + chaos;
-    record("ROUND " + std::to_string(round) + " COMPLETE / Doom +" + std::to_string(1 + chaos) + " -> " + std::to_string(doom) + ".");
+    doom += 1 + instability;
+    record("ROUND " + std::to_string(round) + " COMPLETE / Doom +" + std::to_string(1 + instability) + " -> " + std::to_string(doom) + ".");
     if (boss && boss->getAlive()) --finalRounds;
     if (round % 5 == 0) {
         std::vector<int> preferred, occupied;
@@ -693,7 +693,7 @@ void Game::finishRound() {
             // them if necessary. Defended portals are a fallback only.
             std::shuffle(destinations.begin(), destinations.end(), rng);
             for (int i = 0; i < livingDefenders(); ++i) {
-                // Preserve the previous mix: half Cultists, half specialists.
+                // Preserve the previous mix: half Scavengers, half specialists.
                 const int kindRoll = roll(1, 10);
                 const int kind = kindRoll <= 5 ? 0 : kindRoll <= 8 ? patronEnemy(roll(0, 1) != 0) : roll(1, 4);
                 spawnEnemy(destinations[i % destinations.size()], kind);
@@ -720,16 +720,16 @@ void Game::checkOutcome() {
     if (outcome != Outcome::ongoing) return;
     if (started && boss && !boss->getAlive()) {
         outcome = Outcome::bossSlain;
-        ending = "THE GOD FALLS. The avatar is slain and its invasion breaks. The city is saved.";
+        ending = "THE SOVEREIGN FALLS. The avatar is slain and its invasion breaks. The city is saved.";
     } else if (started && livingDefenders() == 0) {
         outcome = Outcome::defeat;
         ending = "THE WATCH HAS FALLEN. No defender survived.";
     } else if (started && portals.empty() && enemies.empty() && !boss) {
         outcome = Outcome::banished;
         ending = "THE CITY HOLDS. Every enemy is defeated and every portal is closed. The city is saved.";
-    } else if (chaos >= 6) {
+    } else if (instability >= 6) {
         outcome = Outcome::defeat;
-        ending = "THE CITY FALLS. Chaos reaches 6. The defenders break and the warp consumes the district.";
+        ending = "THE CITY FALLS. Instability reaches 6. The defenders break and the breach consumes the district.";
     } else if (boss && boss->getAlive() && finalRounds <= 0) {
         outcome = Outcome::defeat;
         ending = "THE LAST BELL. Eight rounds after manifestation, the city is consumed. The siege is lost.";
@@ -743,7 +743,7 @@ std::vector<std::string> Game::takeLog() { auto result = std::move(log); log.cle
 
 void Game::save(std::ostream& out) const {
     if (!started) throw std::logic_error("Cannot save before deployment.");
-    out << "FORTY_K_RPG 6\n" << static_cast<int>(patron) << ' ' << seed << ' ' << round << ' ' << doom << ' ' << chaos << ' '
+    out << "VEYRA_SAVE 6\n" << static_cast<int>(patron) << ' ' << seed << ' ' << round << ' ' << doom << ' ' << instability << ' '
         << finalRounds << ' ' << nextEnemyId << ' ' << playerIdx << ' ' << kills << ' ' << closed << ' ' << static_cast<int>(outcome) << '\n';
     out << std::quoted(ending) << '\n' << players.size() << '\n';
     for (const auto& p : players) {
@@ -784,14 +784,15 @@ Game Game::load(std::istream& in) {
         if (!(in >> value) || value < low || value > high) throw std::runtime_error("Save contains an invalid or missing number.");
         return static_cast<int>(value);
     };
+    // The old marker is accepted only for importing existing local campaigns.
     std::string magic;
-    if (!(in >> magic) || magic != "FORTY_K_RPG") throw std::runtime_error("Not a supported 40krpg save.");
+    if (!(in >> magic) || (magic != "VEYRA_SAVE" && magic != "FORTY_K_RPG")) throw std::runtime_error("Not a supported Veyra save.");
     const int version = number(1, 6);
     const auto patron = static_cast<BossId>(number(0, 3));
     std::uint64_t seedValue = 0;
     if (!(in >> seedValue) || seedValue > std::numeric_limits<std::uint32_t>::max()) throw std::runtime_error("Invalid save seed.");
     Game game(patron, static_cast<std::uint32_t>(seedValue));
-    game.round = number(1, 10000); game.doom = number(0, 100000); game.chaos = number(0, 6);
+    game.round = number(1, 10000); game.doom = number(0, 100000); game.instability = number(0, 6);
     game.finalRounds = number(0, 8); game.nextEnemyId = number(1, 100000);
     game.playerIdx = static_cast<std::size_t>(number(0, 3));
     game.kills = number(0, 100000); game.closed = number(0, 100000);
@@ -815,7 +816,7 @@ Game Game::load(std::istream& in) {
         }
         if (!p.equip(p.equipped)) throw std::runtime_error("Equipped weapon not owned.");
         for (int& amount : p.supplies) amount = number(0, 99);
-        if (version <= 2) (void)number(0, 99); // Discard retired purity seals from legacy saves.
+        if (version <= 2) (void)number(0, 99); // Discard retired legacy tokens from legacy saves.
         game.players.push_back(std::move(p));
     }
     std::set<int> ids;

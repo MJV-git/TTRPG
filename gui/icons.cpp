@@ -6,11 +6,11 @@
 
 namespace ui {
 Icon sectorIcon(int sector) { return static_cast<Icon>(sector - 1); }
-Icon patronIcon(int patron) { return static_cast<Icon>(static_cast<int>(Icon::khorne) + patron); }
+Icon patronIcon(int patron) { return static_cast<Icon>(static_cast<int>(Icon::emberRegent) + patron); }
 Icon enemyIcon(int kind) {
-    static constexpr std::array<Icon, 15> icons {{Icon::cultist, Icon::chaosMarine, Icon::sorcerer,
-        Icon::acolyte, Icon::warden, Icon::hound, Icon::drone, Icon::bloodletter, Icon::fleshHound,
-        Icon::horror, Icon::flamer, Icon::daemonette, Icon::fiend, Icon::plaguebearer, Icon::beast}};
+    static constexpr std::array<Icon, 15> icons {{Icon::scavenger, Icon::siegeAutomaton, Icon::signalLeech,
+        Icon::breachTuner, Icon::anchor, Icon::wireStalker, Icon::rustDrone, Icon::kilnSentinel, Icon::cinderTracker,
+        Icon::prismMote, Icon::refractionCrawler, Icon::echoRunner, Icon::harmonicProwler, Icon::rustCarrier, Icon::orchardCrawler}};
     return icons.at(kind);
 }
 Icon defenderIcon(const Player& p) {
@@ -18,7 +18,7 @@ Icon defenderIcon(const Player& p) {
         const auto& c = characters()[i];
         if (p.getMaxHealth() == c.health && p.getBaseArmor() == c.armor && p.getStrength() == c.strength &&
             p.getPrecision() == c.precision && p.getBaseWill() == c.will)
-            return static_cast<Icon>(static_cast<int>(Icon::marine) + i);
+            return static_cast<Icon>(static_cast<int>(Icon::bulwark) + i);
     }
     return Icon::defender;
 }
@@ -48,18 +48,23 @@ void Draw::icon(int x, int y, Icon kind, Color c, float scale) {
         l(-4,-3,-2,-2); l(2,-2,4,-3); l(-1,0,0,-2); l(0,-2,1,0);
         for (int i : {-2,0,2}) l(i,3,i,5);
     };
-    auto hood = [&] { path({{-10,8},{-8,-4},{0,-14},{8,-4},{10,8},{0,14},{-10,8}}); skull(); };
-    auto helm = [&] {
-        path({{-8,-3},{-7,-10},{-3,-13},{3,-13},{7,-10},{8,-3},{6,7},{0,11},{-6,7},{-8,-3}});
-        l(-6,-4,-1,-2); l(1,-2,6,-4); rect(-3,1,6,5); l(0,1,0,6);
-        l(-11,1,-14,4); l(-14,4,-14,11); l(-14,11,-7,14);
-        l(11,1,14,4); l(14,4,14,11); l(14,11,7,14);
+    // Veyra uses work helmets, signal instruments and articulated machines.
+    auto visor = [&] {
+        path({{-9,7},{-9,-7},{-5,-12},{6,-12},{10,-7},{10,7},{5,12},{-4,12},{-9,7}});
+        rect(-6,-5,13,5); l(-4,5,5,5); l(0,5,0,10);
+        rect(-13,-1,4,7); rect(10,-1,4,7);
     };
-    auto horns = [&] { path({{-6,-6},{-13,-15},{-12,-5},{-7,0}}); path({{6,-6},{13,-15},{12,-5},{7,0}}); };
-    auto beastHead = [&] {
-        path({{-10,-10},{-7,-4},{-11,1},{-7,9},{0,14},{7,9},{11,1},{7,-4},{10,-10},{3,-6},{-3,-6},{-10,-10}});
-        l(-7,0,-2,2); l(2,2,7,0); path({{-3,7},{0,5},{3,7},{0,10},{-3,7}});
-        l(-5,6,-4,10); l(5,6,4,10);
+    auto signalCore = [&] {
+        path({{0,-12},{8,-4},{8,5},{0,13},{-8,5},{-8,-4},{0,-12}});
+        ring(0,0,4); l(-3,0,3,0); l(0,-3,0,3);
+        for (int side : {-1,1}) { l(side*12,-9,side*12,9); l(side*12,-9,side*8,-13); }
+    };
+    auto crawler = [&] {
+        rect(-7,-9,14,17); rect(-4,-6,8,5); l(-4,4,4,4);
+        for (int side : {-1,1}) for (int row : {-7,0,7}) {
+            path({{side*7.0F,static_cast<float>(row)},{side*13.0F,static_cast<float>(row+3)},
+                  {side*15.0F,static_cast<float>(row+7)}});
+        }
     };
     switch (kind) {
         case Icon::barracks:
@@ -104,19 +109,18 @@ void Draw::icon(int x, int y, Icon kind, Color c, float scale) {
             path({{-15,-2},{-10,-9},{-5,-3},{0,-1},{5,-3},{10,-9},{15,-2}});
             for (int i : {-5,0,5}) l(i,-2,i,5);
             l(-14,14,-4,14); l(4,14,14,14); break;
-        case Icon::marine: helm(); rect(-4,-12,8,3); l(-11,5,-8,5); l(8,5,11,5); break;
-        case Icon::guardsman:
-            path({{-12,-5},{-9,-6},{-8,-11},{-4,-14},{5,-14},{9,-10},{10,-6},{13,-5},{-12,-5}});
-            path({{-7,-4},{-6,7},{0,12},{6,7},{7,-4}}); l(-5,-1,-1,-1); l(1,-1,5,-1);
-            rect(-4,4,8,3); l(-14,14,-7,10); l(7,10,14,14); l(0,-12,0,-8); break;
-        case Icon::psyker: case Icon::sorcerer: case Icon::acolyte:
-            hood(); ring(0,-4,2); l(-13,-8,-15,0); l(-15,0,-11,4); l(13,-8,15,0); l(15,0,11,4);
-            if (kind == Icon::sorcerer) horns();
-            if (kind == Icon::psyker) { ring(0,-1,16); l(-3,10,3,10); }
-            if (kind == Icon::acolyte) { l(-3,11,0,8); l(0,8,3,11); } break;
-        case Icon::sister:
-            helm(); path({{0,-15},{-3,-10},{0,-6},{3,-10},{0,-15}});
-            path({{-8,11},{-3,9},{0,14},{3,9},{8,11}}); l(-12,5,-9,8); l(9,8,12,5); break;
+        case Icon::bulwark:
+            visor(); rect(-13,10,8,5); rect(6,10,8,5); l(-5,-15,6,-15); break;
+        case Icon::trailguard:
+            visor(); l(-6,-8,6,-8); l(13,-4,13,-15); ring(13,-15,1,true); break;
+        case Icon::resonant:
+            visor(); ring(-12,-7,3); ring(13,-7,3); l(-6,-15,6,-15); l(-3,-17,3,-17); break;
+        case Icon::duskblade:
+            visor(); path({{-14,13},{-14,-12},{-11,-16},{-11,13}}); l(-16,7,-9,7); break;
+        case Icon::signalLeech:
+            signalCore(); path({{0,13},{5,16},{11,12},{15,15}}); break;
+        case Icon::breachTuner:
+            signalCore(); l(0,-12,0,-17); l(-5,-15,5,-15); l(-4,15,4,15); break;
         case Icon::defender:
             path({{-12,-11},{0,-15},{12,-11},{11,6},{0,15},{-11,6},{-12,-11}});
             ring(0,-5,4); path({{-7,7},{-5,1},{5,1},{7,7},{-7,7}}); l(-3,10,3,10); break;
@@ -130,55 +134,66 @@ void Draw::icon(int x, int y, Icon kind, Color c, float scale) {
                 l(10*std::cos(a),13*std::sin(a),10*std::cos(b),13*std::sin(b));
             }
             path({{2,-10},{-4,-5},{3,-2},{-3,3},{4,6},{-1,10}}); ring(0,0,3); break;
-        case Icon::cultist: hood(); l(-12,-12,-9,-10); l(9,-10,12,-12); break;
-        case Icon::chaosMarine: helm(); horns(); l(-14,8,-10,11); l(10,11,14,8); break;
-        case Icon::warden:
-            path({{-14,-12},{0,-15},{14,-12},{12,6},{0,16},{-12,6},{-14,-12}});
-            skull(); l(-10,-7,-9,4); l(10,-7,9,4); path({{-6,9},{0,13},{6,9}}); break;
-        case Icon::hound: case Icon::fleshHound: case Icon::fiend:
-            beastHead();
-            if (kind == Icon::fleshHound) { horns(); l(-12,7,-8,13); l(8,13,12,7); }
-            if (kind == Icon::fiend) { l(-13,-14,-5,-5); l(13,-14,5,-5); path({{0,10},{-2,15},{4,16}}); }
+        case Icon::scavenger:
+            visor(); l(-15,13,-15,-12); l(-15,-12,-11,-8); l(-15,-12,-18,-8); break;
+        case Icon::siegeAutomaton:
+            rect(-10,-12,20,23); rect(-7,-8,14,5); rect(-5,3,10,5);
+            rect(-15,-4,5,15); rect(10,-4,5,15); l(-7,14,-2,14); l(2,14,7,14); break;
+        case Icon::anchor:
+            rect(-11,-13,22,25); rect(-7,-9,14,18); ring(0,-2,4);
+            l(0,2,0,16); l(-8,16,8,16); l(-15,-4,-11,-4); l(11,-4,15,-4); break;
+        case Icon::wireStalker:
+            crawler(); l(-3,-9,-7,-15); l(3,-9,7,-15); break;
+        case Icon::cinderTracker:
+            crawler(); path({{-4,-10},{0,-17},{4,-10}}); ring(0,2,2,true); break;
+        case Icon::harmonicProwler:
+            crawler(); l(-3,-15,-3,-10); l(0,-17,0,-10); l(3,-15,3,-10); break;
+        case Icon::rustDrone:
+            rect(-6,-7,12,16); ring(0,-2,3); ring(-12,-9,4); ring(12,-9,4);
+            l(-12,-5,-6,0); l(12,-5,6,0); l(-3,9,-5,15); l(3,9,5,15); break;
+        case Icon::kilnSentinel:
+            path({{-10,13},{-10,-8},{-6,-12},{6,-12},{10,-8},{10,13},{-10,13}});
+            rect(-6,-5,12,12); for (int i : {-3,1,5}) l(-5,i,5,i);
+            l(-15,12,-15,-15); l(-15,-15,-11,-11); l(13,-9,13,9); break;
+        case Icon::prismMote:
+            path({{0,-15},{12,0},{0,15},{-12,0},{0,-15},{0,15}});
+            l(-12,0,12,0); l(-15,-11,-10,-11); l(10,11,15,11); break;
+        case Icon::refractionCrawler:
+            crawler(); path({{0,-16},{6,-8},{0,-2},{-6,-8},{0,-16}}); break;
+        case Icon::echoRunner:
+            rect(-5,-12,10,10); ring(0,-7,2); l(0,-2,0,6);
+            path({{0,2},{-10,-2},{-13,2}}); path({{0,2},{9,6},{13,2}});
+            path({{0,6},{-7,10},{-3,15}}); path({{0,6},{7,9},{13,15}}); break;
+        case Icon::rustCarrier:
+            rect(-10,-12,20,25); rect(-6,-8,12,7); l(-6,4,6,4); l(0,1,0,8);
+            path({{-14,-6},{-14,7},{-10,11}}); path({{14,-6},{14,7},{10,11}}); break;
+        case Icon::orchardCrawler:
+            crawler(); path({{0,-9},{0,-16},{-6,-13},{0,-11},{6,-15}});
+            l(-4,2,4,2); l(0,0,0,5); break;
+        case Icon::emberRegent:
+            // A furnace stack and heat vents, with no heraldic skull or horns.
+            path({{-12,14},{-10,-5},{-6,-5},{-6,-15},{6,-15},{6,-5},{10,-5},{12,14},{-12,14}});
+            rect(-6,0,12,10); for (int i : {3,6,9}) l(-5,i,5,i);
+            l(-15,-10,-12,-6); l(15,-10,12,-6); break;
+        case Icon::prismOracle:
+            path({{0,-16},{11,-3},{4,14},{-9,6},{-12,-4},{0,-16}});
+            path({{0,-16},{0,1},{11,-3}}); l(0,1,4,14); l(0,1,-9,6);
+            l(-16,12,-10,12); l(11,-12,16,-12); break;
+        case Icon::echoWeaver:
+            for (int row : {-9,0,9})
+                path({{-15,static_cast<float>(row)},{-8,static_cast<float>(row)},
+                      {-4,static_cast<float>(row-5)},{2,static_cast<float>(row+5)},
+                      {7,static_cast<float>(row)},{15,static_cast<float>(row)}});
             break;
-        case Icon::drone:
-            ring(0,2,8); ring(0,0,3); ring(-9,-8,5); ring(9,-8,5);
-            l(-9,-13,-9,-3); l(-14,-8,-4,-8); l(9,-13,9,-3); l(4,-8,14,-8);
-            path({{-6,7},{-12,10},{-14,15}}); path({{6,7},{12,10},{14,15}}); l(0,10,0,15); break;
-        case Icon::bloodletter: skull(); horns(); path({{-8,2},{-6,10},{0,15},{6,10},{8,2}}); l(0,6,0,12); break;
-        case Icon::horror:
-            path({{-12,13},{-8,2},{-13,-3},{-5,-5},{-7,-13},{1,-8},{7,-14},{8,-6},{14,-2},{8,3},{12,13},{0,9},{-12,13}});
-            ring(-3,-1,2); ring(4,-2,3); path({{-5,5},{0,3},{5,5},{0,7},{-5,5}}); break;
-        case Icon::flamer:
-            path({{-11,13},{-14,4},{-9,-2},{-11,-10},{-4,-6},{0,-16},{5,-5},{10,-11},{9,0},{14,6},{9,14},{-11,13}});
-            ring(0,3,5); ring(0,3,2); l(-5,10,-2,8); l(3,9,6,11); break;
-        case Icon::daemonette:
-            skull(); path({{-5,-7},{-10,-13},{-14,-9},{-10,-4}}); path({{5,-7},{10,-13},{14,-9},{10,-4}});
-            path({{-8,1},{-12,8},{-8,14},{-4,8}}); path({{8,1},{12,8},{8,14},{4,8}}); l(0,7,0,14); break;
-        case Icon::plaguebearer:
-            path({{-10,-7},{-6,-12},{-2,-9},{0,-16},{3,-9},{9,-8},{12,5},{7,14},{-7,14},{-12,5},{-10,-7}});
-            ring(0,-4,3); l(-6,3,6,3); for (int i : {-4,0,4}) l(i,3,i,7);
-            ring(-6,10,1,true); ring(6,10,1,true); break;
-        case Icon::beast:
-            path({{-15,12},{-12,4},{-13,-4},{-7,-10},{-2,-9},{3,-13},{10,-8},{13,2},{11,8},{15,13},{-15,12}});
-            ring(-4,-3,2); ring(4,-4,2); path({{-7,3},{0,1},{7,3},{5,8},{-3,8},{-7,3}});
-            path({{0,5},{0,12},{6,15},{10,13}}); ring(-8,9,1,true); ring(8,-1,1,true); break;
-        case Icon::khorne:
-            skull(); path({{-15,-13},{-8,-13},{-8,-6},{-3,-6}}); path({{15,-13},{8,-13},{8,-6},{3,-6}});
-            path({{-14,1},{-8,11},{0,16},{8,11},{14,1}}); l(-10,9,-14,14); l(10,9,14,14); break;
-        case Icon::tzeentch:
-            path({{-14,0},{-6,-6},{7,-6},{14,0},{7,6},{-6,6},{-14,0}}); ring(1,0,4); ring(1,0,1,true);
-            path({{-5,-7},{-4,-13},{2,-16},{7,-12}}); path({{4,7},{2,12},{-5,15},{-10,12}}); l(-11,-5,-14,-10); break;
-        case Icon::slaanesh:
-            ring(-3,-3,9); path({{2,-12},{9,-14},{12,-9},{7,-5}});
-            l(-3,6,-3,16); l(-8,11,2,11); path({{6,4},{13,8},{9,14}}); ring(-3,-3,3); break;
-        case Icon::nurgle:
-            for (const auto& p : std::array<SDL_Point,3>{{{0,-7},{-8,7},{8,7}}}) { ring(p.x,p.y,6); ring(p.x,p.y,2); }
-            l(-5,-2,-3,2); l(5,-2,3,2); l(-2,7,2,7); break;
+        case Icon::rustGardener:
+            l(0,15,0,-15); path({{0,-9},{-8,-12},{-13,-8}});
+            path({{0,-2},{8,-7},{13,-4}}); path({{0,5},{-8,1},{-13,5}});
+            path({{0,11},{8,7},{13,11}}); rect(-3,13,6,3); break;
         case Icon::insignia:
-            path({{-3,-14},{0,-17},{3,-14},{2,7},{0,14},{-2,7},{-3,-14}});
-            for (int side : {-1,1}) for (int i = 0; i < 4; ++i)
-                path({{side*4.0F,-5.0F+i*3},{side*(16.0F-i*2),-10.0F+i*4},{side*(14.0F-i*2),-5.0F+i*4},{side*4.0F,0.0F+i*2}});
-            l(-5,8,5,8); ring(0,-5,3); break;
+            // The city's relay beacon: an open square, mast and signal bars.
+            path({{-14,9},{-14,-12},{-7,-12}}); path({{7,-12},{14,-12},{14,9}});
+            l(0,-8,0,13); path({{-6,13},{0,7},{6,13},{-6,13}}); ring(0,-9,3);
+            l(-8,-6,-8,2); l(8,-6,8,2); l(-11,15,11,15); break;
         case Icon::supplies:
             path({{-13,-7},{0,-12},{13,-7},{13,10},{0,15},{-13,10},{-13,-7},{0,-2},{13,-7}});
             l(0,-2,0,15); l(-6,-9,7,-4); l(7,-4,7,12); l(-9,2,-4,4); l(-9,6,-4,8); break;
@@ -191,7 +206,7 @@ void Draw::icon(int x, int y, Icon kind, Color c, float scale) {
             rect(-4,-12,8,4); ring(6,-12,3); path({{-4,-8},{-9,-3},{-9,9},{-4,14},{4,14},{9,9},{9,-3},{4,-8},{-4,-8}});
             for (int i : {-3,3,9}) l(-8,i,8,i);
             l(-3,-5,-3,12); l(3,-5,3,12); break;
-        case Icon::skull: skull(); horns(); l(-10,12,10,8); l(-10,8,10,12); break;
+        case Icon::skull: skull(); l(-10,12,10,8); l(-10,8,10,12); break;
     }
 }
 }

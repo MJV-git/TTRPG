@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-enum class WeaponId { pistol, lasgun, bolter, sword, heavyBolter, staff, marksmanBolter, plasmaGun, thunderHammer, forceHalberd };
+enum class WeaponId { pistol, beamCarbine, rivetRifle, sword, rotaryRiveter, staff, needleRifle, thermalCannon, pileMaul, resonanceGlaive };
 enum class Consumable { medkit, grenade };
 enum class Accuracy { strength, precision, will };
 struct Weapon {
